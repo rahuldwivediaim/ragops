@@ -1,0 +1,22 @@
+# =============================================================================
+# Production Configuration
+# Overrides base.yaml
+# =============================================================================
+
+application:
+  environment: "production"
+
+logging:
+  level: "WARNING"
+
+providers:
+  llm:
+    timeout: 20
+    max_retries: 5
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+
+security:
+  token_expiry_minutes: 30

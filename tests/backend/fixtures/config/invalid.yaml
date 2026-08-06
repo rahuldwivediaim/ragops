@@ -1,0 +1,19 @@
+# =============================================================================
+# Invalid Configuration
+# Used for validation tests
+# =============================================================================
+
+application:
+  name: 12345
+
+logging:
+  level: "INVALID_LEVEL"
+
+providers:
+  llm:
+    provider: "unknown_provider"
+    timeout: -10
+    max_retries: -5
+
+api:
+  port: "eight_thousand"

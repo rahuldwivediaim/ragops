@@ -1,0 +1,25 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Runtime
+storage/
+error.txt
+
+# Environment
+.env
+
+# Local snapshots (if ever created)
+snapshots/
+
+# OS
+Thumbs.db
+.DS_Store

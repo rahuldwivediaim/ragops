@@ -1,0 +1,35 @@
+# =============================================================================
+# Base Configuration
+# Shared by all environments
+# =============================================================================
+
+application:
+  name: "RAGOps Platform"
+  version: "1.0.0"
+  environment: "base"
+
+logging:
+  level: "INFO"
+  format: "json"
+  file: "logs/ragops.log"
+
+security:
+  jwt_algorithm: "HS256"
+  token_expiry_minutes: 60
+
+providers:
+  llm:
+    provider: "openai"
+    timeout: 30
+    max_retries: 3
+
+  embedding:
+    provider: "openai"
+
+storage:
+  vector_db:
+    provider: "pinecone"
+
+api:
+  host: "0.0.0.0"
+  port: 8000

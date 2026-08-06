@@ -1,0 +1,148 @@
+###############################################################################
+# RAGOps Enterprise Configuration
+###############################################################################
+
+application_name: "RAGOps Platform"
+version: "1.0.0"
+
+environment: development
+
+paths:
+  root_dir: .
+  data_dir: data
+  logs_dir: logs
+  temp_dir: temp
+
+features:
+  rag: true
+  plugins: true
+  telemetry: true
+  caching: true
+  authentication: true
+  authorization: true
+
+health:
+  enabled: true
+  timeout_seconds: 10
+
+logging:
+  level: INFO
+  service_name: ragops
+  correlation_id_header: X-Correlation-ID
+  request_id_header: X-Request-ID
+
+  console:
+    enabled: true
+    json_output: false
+    colored: true
+
+  file:
+    enabled: true
+    directory: logs
+    filename: ragops.log
+    json_output: true
+    rotation:
+      enabled: true
+      max_file_size_mb: 100
+      backup_count: 10
+      compress: true
+
+  audit:
+    enabled: true
+    filename: audit.log
+
+authentication:
+  enabled: false
+  jwt:
+    algorithm: HS256
+    access_token_expiry_minutes: 60
+    refresh_token_expiry_days: 30
+  api_key:
+    enabled: false
+    header_name: X-API-Key
+  cookies:
+    secure: false
+    http_only: true
+    same_site: lax
+
+authorization:
+  enabled: true
+  rbac: true
+  default_role: user
+
+cors:
+  enabled: true
+  allow_origins:
+    - "*"
+  allow_methods:
+    - "*"
+  allow_headers:
+    - "*"
+  allow_credentials: true
+
+encryption:
+  enabled: false
+  algorithm: AES-256-GCM
+
+llm:
+  enabled: true
+  provider: openai
+  model: gpt-4.1
+  timeout_seconds: 60
+  temperature: 0.0
+  max_tokens: 4096
+  retry:
+    max_attempts: 3
+    initial_delay_seconds: 1.0
+    max_delay_seconds: 30.0
+    exponential_backoff: true
+
+embeddings:
+  enabled: true
+  provider: openai
+  model: text-embedding-3-small
+  dimensions: 1536
+  timeout_seconds: 60
+  retry:
+    max_attempts: 3
+    initial_delay_seconds: 1.0
+    max_delay_seconds: 30.0
+    exponential_backoff: true
+
+vector_store:
+  enabled: true
+  provider: pgvector
+  index_name: ragops
+  namespace: default
+  timeout_seconds: 60
+  retry:
+    max_attempts: 3
+    initial_delay_seconds: 1.0
+    max_delay_seconds: 30.0
+    exponential_backoff: true
+
+storage_root: storage
+
+storage:
+  enabled: true
+  provider: local
+  timeout_seconds: 60
+  retry:
+    max_attempts: 3
+    initial_delay_seconds: 1.0
+    max_delay_seconds: 30.0
+    exponential_backoff: true
+
+ocr:
+  enabled: false
+  provider: tesseract
+  language: en
+  timeout_seconds: 60
+  retry:
+    max_attempts: 3
+    initial_delay_seconds: 1.0
+    max_delay_seconds: 30.0
+    exponential_backoff: true
+
+speech: null
+reranker: null
