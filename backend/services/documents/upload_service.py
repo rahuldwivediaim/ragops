@@ -158,11 +158,11 @@ class UploadService:
 
             version = self._persist_document_version(version)
 
-            # self._trigger_ingestion(
-            #     document=document,
-            #     version=version,
-            #     stored_document=stored_document,
-            # )
+            self._trigger_ingestion(
+                document=document,
+                version=version,
+                stored_document=stored_document,
+            )
 
             return self._build_response(
                 document=document,
@@ -472,6 +472,9 @@ class UploadService:
 
         self._ingestion_service.ingest(
             source=stored_document.absolute_path,
+            document_id=document.id,
+            document_version_id=version.id,
+            knowledge_base_id=document.knowledge_base_id,
             metadata=metadata,
         )
 

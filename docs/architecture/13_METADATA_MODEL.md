@@ -21,3 +21,7 @@ Retrieval Filtering
 Authorization
 
 Future Extensions
+
+Business Metadata
+Processing Metadata
+Operational Metadata

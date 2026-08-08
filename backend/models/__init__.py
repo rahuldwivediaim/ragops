@@ -31,6 +31,7 @@ from .mixins import (
 from .knowledge_base import KnowledgeBase
 from .document import Document
 from .document_version import DocumentVersion
+from .document_parsing_metadata import DocumentParsingMetadata
 from .chunk import Chunk
 from .embedding_profile import EmbeddingProfile
 from .embedding import Embedding
@@ -49,6 +50,7 @@ __all__ = [
     "KnowledgeBase",
     "Document",
     "DocumentVersion",
+    "DocumentParsingMetadata",
     "Chunk",
     "EmbeddingProfile",
     "Embedding",

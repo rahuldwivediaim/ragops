@@ -5,11 +5,10 @@ This service orchestrates the complete document ingestion workflow.
 
 Workflow
 --------
-1. Validate input
-2. Parse document
-3. Chunk text
-4. Generate embeddings
-5. Store vectors
+1. Build processing context
+2. Execute processing pipeline
+3. Persist processing metadata
+4. Complete operation
 
 Each step is intentionally isolated to make the pipeline
 easy to extend and test.
@@ -23,6 +22,16 @@ from typing import Any
 from backend.operations.enums import OperationType
 from backend.operations.tracker import OperationTracker
 
+from uuid import UUID
+
+from backend.document_processing.pipeline import (
+    ProcessingContext,
+    ProcessingPipeline,
+)
+from backend.repositories.document_parsing_metadata_repository import (
+    DocumentParsingMetadataRepository,
+)
+
 
 class DocumentIngestionService:
     """
@@ -32,12 +41,19 @@ class DocumentIngestionService:
     def __init__(
         self,
         tracker: OperationTracker,
+        pipeline: ProcessingPipeline,
+        parsing_metadata_repository: DocumentParsingMetadataRepository,
     ) -> None:
         self._tracker = tracker
+        self._pipeline = pipeline
+        self._parsing_metadata_repository = parsing_metadata_repository
 
     def ingest(
         self,
         source: str | Path,
+        document_id: UUID,
+        document_version_id: UUID,
+        knowledge_base_id: UUID,
         metadata: dict[str, Any] | None = None,
     ) -> None:
         """
@@ -62,15 +78,22 @@ class DocumentIngestionService:
         context.metadata.update(metadata or {})
 
         try:
-            self._validate(path)
+            processing_context = ProcessingContext(
+                document_id=document_id,
+                document_version_id=document_version_id,
+                knowledge_base_id=knowledge_base_id,
+                source_file=path,
+            )
 
-            document = self._parse(path)
+            result = self._pipeline.execute(processing_context)
 
-            chunks = self._chunk(document)
+            if result.failed:
+                raise result.exception
 
-            embeddings = self._embed(chunks)
-
-            self._store(embeddings)
+            if processing_context.parsing_metadata is not None:
+                self._parsing_metadata_repository.add(
+                    processing_context.parsing_metadata
+                )
 
             self._tracker.complete(context)
 
@@ -81,68 +104,6 @@ class DocumentIngestionService:
             )
 
             raise
-
-    def _validate(
-        self,
-        path: Path,
-    ) -> None:
-        """
-        Validate document.
-        """
-
-        if not path.exists():
-            raise FileNotFoundError(path)
-
-        if not path.is_file():
-            raise ValueError(f"{path} is not a file.")
-
-    def _parse(
-        self,
-        path: Path,
-    ) -> str:
-        """
-        Parse document.
-
-        Placeholder implementation.
-        """
-
-        raise NotImplementedError("PDF parser not implemented.")
-
-    def _chunk(
-        self,
-        document: str,
-    ) -> list[str]:
-        """
-        Chunk document.
-
-        Placeholder implementation.
-        """
-
-        raise NotImplementedError("Chunker not implemented.")
-
-    def _embed(
-        self,
-        chunks: list[str],
-    ) -> list[Any]:
-        """
-        Generate embeddings.
-
-        Placeholder implementation.
-        """
-
-        raise NotImplementedError("Embedding provider not implemented.")
-
-    def _store(
-        self,
-        embeddings: list[Any],
-    ) -> None:
-        """
-        Store embeddings.
-
-        Placeholder implementation.
-        """
-
-        raise NotImplementedError("Vector store not implemented.")
 
 
 __all__ = [

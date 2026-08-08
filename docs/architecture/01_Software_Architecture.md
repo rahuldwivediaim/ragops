@@ -1,3 +1,7 @@
+Version      : 1.1.0
+Status       : Approved
+Last Updated : August 2026
+
 # Software Architecture
 
 | Property | Value |
@@ -35,6 +39,8 @@ The architecture has been designed with the following objectives:
 - SDK-first integration
 - Cloud agnostic deployment
 - Configuration-driven behaviour
+- Observable operations
+- Processing pipeline extensibility
 
 ---
 
@@ -117,6 +123,32 @@ Infrastructure
 
 Each layer has a single responsibility and communicates only through well-defined interfaces.
 
+## 7. Business and Processing Separation
+
+The platform separates business entities from processing execution.
+
+Business entities represent organizational knowledge such as Knowledge Bases,
+Documents and Document Versions.
+
+Processing represents the lifecycle used to transform knowledge assets into
+searchable content.
+
+This separation enables independent evolution of business capabilities and
+processing pipelines.
+
+## 8. Observability by Design
+
+Every business operation should produce meaningful operational information.
+
+Operational information should support:
+
+- Progress tracking
+- Diagnostics
+- Performance measurement
+- Auditing
+
+Operational information should remain separate from business data.
+
 ---
 
 # Major Components
@@ -143,10 +175,14 @@ Responsible for managing enterprise knowledge.
 
 Capabilities include:
 
-- Document ingestion
+- Knowledge Base Management
+- Document Management
+- Document Version Management
+- Document Ingestion
+- Processing Pipeline
 - Parsing
 - Chunking
-- Metadata
+- Metadata Management
 - Embeddings
 - Indexing
 
@@ -178,6 +214,8 @@ Capabilities include:
 - Notifications
 - Scheduler
 - Evaluation
+- Operation Tracking
+- Processing Monitoring
 
 ---
 
@@ -208,6 +246,35 @@ The following services are shared across all layers.
 - Database Access
 - Common Models
 - Utilities
+- Operation Tracking
+
+# Current Implementation Status
+
+## Completed
+
+- Configuration Framework
+- Plugin Framework
+- Provider Framework
+- Storage Framework
+- Parser Framework
+- PDF Provider (PyMuPDF)
+- REST API Foundation
+- Repository Layer
+- Upload Pipeline
+- Operations Framework
+
+## In Progress
+
+- Processing Lifecycle
+- Parsing Metadata Persistence
+
+## Planned
+
+- Chunking Engine
+- Embedding Framework
+- Vector Store Integration
+- Retrieval Engine
+- Chat Engine
 
 ---
 
@@ -265,6 +332,8 @@ Future versions may introduce:
 - Agent framework
 - MCP Server integration
 - Marketplace for plugins
+- Background Processing
+- Retry Framework
 
 ---
 
@@ -282,5 +351,3 @@ Planned deployment models include:
 - Sidecar / Embedded
 
 These deployment models are intentionally deferred to future releases and are not part of the v1.0 implementation scope.
-
-**Document Status:** Draft

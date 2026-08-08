@@ -1,18 +1,29 @@
 """
 Embedding model.
 
-Represents an embedding generated for a chunk during an ingestion run.
-Only embedding metadata is stored in PostgreSQL. The actual vector is
-stored in the configured vector database.
+Represents metadata for an embedding generated from a chunk during an
+ingestion run.
+
+Only metadata is stored in PostgreSQL. The embedding vector itself is
+stored in the configured vector database (for example Pinecone).
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship,
+)
 
 from backend.models.constants import EXTERNAL_ID_LENGTH
 from backend.models.entity import Entity
@@ -27,7 +38,8 @@ class Embedding(Entity):
     """
     Embedding metadata.
 
-    One embedding belongs to one chunk and one ingestion.
+    One embedding belongs to one chunk, one ingestion and one vector
+    index.
     """
 
     __tablename__ = "embeddings"
@@ -78,6 +90,22 @@ class Embedding(Entity):
         nullable=False,
     )
 
+    provider: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+    )
+
+    model_name: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    embedding_version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+    )
+
     # ------------------------------------------------------------------
     # Relationships
     # ------------------------------------------------------------------
@@ -105,4 +133,16 @@ class Embedding(Entity):
     # ------------------------------------------------------------------
 
     def __repr__(self) -> str:
-        return f"Embedding(id={self.id}, vector_identifier='{self.vector_identifier}')"
+        return (
+            "Embedding("
+            f"id={self.id}, "
+            f"provider='{self.provider}', "
+            f"model='{self.model_name}', "
+            f"dimensions={self.dimensions}, "
+            f"vector_identifier='{self.vector_identifier}')"
+        )
+
+
+__all__ = [
+    "Embedding",
+]

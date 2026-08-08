@@ -8,7 +8,7 @@
 
 # 1. Purpose
 
-This document defines the architectural principles that govern the design, development, and evolution of the Enterprise RAG Framework.
+This document defines the architectural principles that govern the design, development, and evolution of the RAGOps Enterprise RAG Framework.
 
 These principles serve as the foundation for all architectural and implementation decisions. Whenever a new feature, module, or enhancement is proposed, it should be evaluated against these principles.
 
@@ -58,6 +58,8 @@ Avoid exposing low-level pipeline activities such as:
 - Vector Insert Completed
 
 These are implementation details and should remain internal to the framework.
+
+Business operations and processing lifecycle are separate concerns. Users interact with business operations (Upload Document, Delete Document, Ask Question), while internal processing stages (Validation, Parsing, Chunking, Embedding, Indexing) remain implementation details exposed only through administrative and operational views when required.
 
 ---
 
@@ -154,9 +156,21 @@ Examples of tracked operations:
 
 Technical execution details are considered metadata and may be stored for troubleshooting, but they should not become primary operational records.
 
+Business operation tracking is complemented by processing lifecycle tracking.
+
+Business operations answer:
+
+"What business action occurred?"
+
+Processing lifecycle answers:
+
+"How did the framework execute that action?"
+
+Both are valuable but serve different audiences.
+
 ---
 
-## Principle 8 – Separation of Operational and Debug Information
+## Principle 8 – Separation of Business, Processing and Debug Information
 
 Operational tracking and debugging serve different audiences.
 
@@ -174,7 +188,26 @@ Detailed execution logs should only be generated when debugging is required.
 
 ---
 
-## Principle 9 – Enterprise Boundaries
+## Principle 9 – Processing Pipeline
+
+Document processing is implemented as a pipeline composed of independent stages.
+
+Typical stages include:
+
+- Validation
+- Parsing
+- Chunking
+- Embedding
+- Indexing
+
+Each stage should:
+
+- Have a single responsibility.
+- Be independently testable.
+- Produce meaningful operational information.
+- Be replaceable without affecting the overall pipeline.
+
+## Principle 10 – Enterprise Boundaries
 
 The Enterprise RAG Framework focuses exclusively on capabilities required for RAG applications.
 
@@ -194,7 +227,7 @@ Maintaining this separation keeps both products focused and maintainable.
 
 ---
 
-## Principle 10 – Documentation Before Implementation
+## Principle 11 – Documentation Before Implementation
 
 Significant architectural decisions should be documented before implementation begins.
 
@@ -214,6 +247,10 @@ Documentation is considered part of the implementation, not an afterthought.
 # 4. Decision Checklist
 
 Before implementing a new feature, architects and developers should consider the following questions.
+
+### Processing
+
+- Is this a business responsibility or a processing responsibility?
 
 ### Purpose
 
@@ -253,6 +290,8 @@ The architecture is considered successful when:
 - New providers can be added without modifying existing code.
 - Operational information is meaningful to administrators.
 - The framework remains simple even as new features are added.
+- Business operations remain intuitive for end users.
+- Internal processing stages remain modular and independently evolvable.
 
 ---
 

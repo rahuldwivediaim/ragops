@@ -31,6 +31,9 @@ from backend.models.entity import Entity
 
 if TYPE_CHECKING:
     from backend.models.document import Document
+    from backend.models.document_parsing_metadata import (
+        DocumentParsingMetadata,
+    )
     from backend.models.ingestion import Ingestion
 
 
@@ -131,6 +134,14 @@ class DocumentVersion(Entity):
         "Ingestion",
         back_populates="document_version",
         cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    parsing_metadata: Mapped["DocumentParsingMetadata | None"] = relationship(
+        "DocumentParsingMetadata",
+        back_populates="document_version",
+        cascade="all, delete-orphan",
+        uselist=False,
         lazy="selectin",
     )
 

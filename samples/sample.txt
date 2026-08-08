@@ -1,0 +1,12 @@
+Welcome to RAGOps.
+
+This is our first parser.
+
+The parser framework is working successfully.
+
+CHENNAI: DMK announced its decision to boycott the consultative meeting of Tamil Nadu MPs convened by the TVK govt to evolve a collective strategy for the state regarding delimitation of parliamentary constituencies.
+In a statement, DMK deputy general secretary Kanimozhi Karunanidhi criticised the state govt's move as a ‘political drama’ intended to divert public attention from the ongoing Mekedatu dam controversy and Cauvery water dispute.
+Kanimozhi highlighted that party president and former chief minister M K Stalin had previously alerted the state to the potential risks of delimitation, organised an all-party meeting, and established a joint action committee in Chennai alongside chief ministers and political leaders from other southern states.
+She stressed that DMK's stance remains firm and unchanged based on the resolutions unanimously adopted in the earlier all-party meeting.
+The Union govt must guarantee that the 1971 population census remains the baseline for defining parliamentary constituencies for an additional 30 years beyond 2026, backed by a constitutional amendment.
+If the overall strength of Parliament is increased, the proportional representation of Tamil Nadu (7.18%) and other southern states across both Houses must be maintained based on 1971 population ratios.

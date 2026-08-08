@@ -221,11 +221,11 @@ Top-Level Items:
         env_backup = out / f".env_{ts}"
         env_backup.write_bytes(env_file.read_bytes())
         print(f".env backup created:\n{env_backup}")
-        
+
         recover = out / f"RECOVER_PROJECT_{ts}.md"
 
     recover.write_text(
-    f"""# Project Recovery
+        f"""# Project Recovery
 
     Project
     -------
@@ -234,7 +234,7 @@ Top-Level Items:
     Snapshot
     --------
     {zip_path.name}
-    
+
     Python Version:
     <detected version>
 
@@ -291,10 +291,11 @@ Top-Level Items:
     - Upload sample document
     - Health endpoint
     """,
-    encoding="utf-8",
+        encoding="utf-8",
     )
 
     print(f"Recovery guide created:\n{recover}")
+
 
 if __name__ == "__main__":
     main()

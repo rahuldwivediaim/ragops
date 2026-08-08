@@ -1,3 +1,7 @@
+Version      : 1.1.0
+Status       : Approved
+Last Updated : August 2026
+
 # High-Level Design (HLD)
 
 | Property | Value |
@@ -16,7 +20,7 @@
 
 This document describes the high-level architecture of the RAGOps platform, its major components, responsibilities, communication patterns, and deployment model.
 
-The objective is to provide a shared understanding of the system before implementation begins.
+The objective is to provide a shared understanding of the platform architecture and guide implementation throughout the product lifecycle.
 
 ---
 
@@ -84,7 +88,7 @@ The platform is designed to achieve the following goals:
           |          |          |         |         |                 |
       LLMs      Embeddings   Vector DB   OCR     Storage       Notifications
 ```
-
+**Note:** Within the Knowledge Plane, document ingestion is implemented through a Processing Pipeline consisting of independent processing stages such as Validation, Parsing, Chunking, Embedding and Indexing. The current implementation includes Upload, Validation and Parsing, with additional stages planned for future releases.
 ---
 
 # Component Overview
@@ -150,13 +154,16 @@ Responsible for knowledge lifecycle management.
 
 Capabilities:
 
+- Knowledge Base Management
+- Document Management
+- Document Version Management
 - Document Upload
+- Processing Pipeline
 - Document Parsing
-- OCR
 - Metadata Extraction
-- Chunking
-- Embedding Generation
-- Indexing
+- Chunking (Planned)
+- Embedding Generation (Planned)
+- Indexing (Planned)
 - Knowledge Repository
 
 ---
@@ -229,14 +236,14 @@ Typical document ingestion flow:
 
 1. User uploads a document.
 2. REST API validates the request.
-3. Knowledge Plane processes the document.
-4. Parser extracts text.
-5. OCR is used if required.
-6. Chunking strategy is applied.
-7. Embeddings are generated.
-8. Metadata is extracted.
-9. Vector Store indexes the data.
-10. Status is returned to the user.
+3. Upload Service validates and stores the file.
+4. Document metadata is persisted.
+5. Processing Pipeline begins.
+6. Validation stage executes.
+7. Parser Framework selects the appropriate parser.
+8. Provider Framework extracts document content.
+9. Parsed metadata is generated.
+10. Document becomes ready for chunking.
 
 ---
 
@@ -266,6 +273,7 @@ These services are shared across all modules:
 - Caching
 - Metrics
 - Auditing
+- Operation Tracking
 
 ---
 
@@ -313,6 +321,7 @@ The architecture supports:
 - Independent service evolution
 - Pluggable infrastructure
 - Provider replacement without code changes
+- Independent evolution of processing stages
 
 ---
 
@@ -335,6 +344,7 @@ Security controls include:
 - All APIs are versioned.
 - Configuration is externalised.
 - Services are stateless where practical.
+- Metadata Model
 
 ---
 
@@ -363,6 +373,7 @@ The following topics are covered in separate documents:
 
 # Change History
 
-| Version | Date | Description |
-|----------|------|-------------|
-| 0.1.0 | 28 Jul 2026 | Initial draft |
+| Version | Date       | Description                                                       |
+
+| 1.1.0   | Aug 2026    | current implementation and processing pipeline |
+| 0.1.0   | 28 Jul 2026 | Initial draft
