@@ -205,6 +205,24 @@ class UploadService:
 
         return knowledge_base
 
+    def _get_filename(
+        self,
+        upload_file: UploadFile,
+    ) -> str:
+        """
+        Return a validated upload filename.
+        """
+
+        filename = upload_file.filename
+
+        if filename is None:
+            raise ValueError("Uploaded filename cannot be empty.")
+
+        if not filename.strip():
+            raise ValueError("Uploaded filename cannot be empty.")
+
+        return filename
+
     def _validate_upload(
         self,
         upload_file: UploadFile,
@@ -309,7 +327,7 @@ class UploadService:
         stored_document = self._storage_service.store_document(
             source_file=temporary_file,
             knowledge_base_code=knowledge_base.code,
-            original_file_name=upload_file.filename,
+            original_file_name=self._get_filename(upload_file),
             version_number=1,
         )
 
@@ -358,7 +376,7 @@ class UploadService:
             knowledge_base_id=knowledge_base.id,
             title=metadata.title,
             description=metadata.description,
-            document_type=DocumentTypeResolver.resolve(upload_file.filename),
+            document_type=DocumentTypeResolver.resolve(self._get_filename(upload_file)),
             source=DocumentSource.MANUAL,
             status=DocumentStatus.PENDING,
         )
@@ -381,12 +399,14 @@ class UploadService:
             document.id
         )
 
+        filename = self._get_filename(upload_file)
+
         version = DocumentVersion(
             document_id=document.id,
             version_number=version_number,
             version_label=f"v{version_number}",
-            file_name=upload_file.filename,
-            file_extension=Path(upload_file.filename).suffix.lower(),
+            file_name=filename,
+            file_extension=Path(filename).suffix.lower(),
             mime_type=upload_file.content_type,
             file_size_bytes=stored_document.file_size_bytes,
             content_hash=content_hash,
@@ -474,7 +494,7 @@ class UploadService:
             source=stored_document.absolute_path,
             document_id=document.id,
             document_version_id=version.id,
-            knowledge_base_id=document.knowledge_base_id,
+            knowledge_base_id=UUID(str(document.knowledge_base_id)),
             metadata=metadata,
         )
 
@@ -497,7 +517,7 @@ class UploadService:
         return DocumentUploadResponse(
             document_id=document.id,
             version_id=version.id,
-            knowledge_base_id=document.knowledge_base_id,
+            knowledge_base_id=UUID(str(document.knowledge_base_id)),
             filename=stored_document.file_name,
             original_filename=upload_file.filename,
             content_type=upload_file.content_type or "",

@@ -1,12 +1,263 @@
-Welcome to RAGOps.
+RAGFramework Employee Knowledge Base
+====================================
 
-This is our first parser.
+Document ID: RAG-EMP-001
+Document Version: 1.0
+Department: Human Resources
+Effective Date: January 1, 2026
 
-The parser framework is working successfully.
+1. Annual Leave Policy
+----------------------
 
-CHENNAI: DMK announced its decision to boycott the consultative meeting of Tamil Nadu MPs convened by the TVK govt to evolve a collective strategy for the state regarding delimitation of parliamentary constituencies.
-In a statement, DMK deputy general secretary Kanimozhi Karunanidhi criticised the state govt's move as a ‘political drama’ intended to divert public attention from the ongoing Mekedatu dam controversy and Cauvery water dispute.
-Kanimozhi highlighted that party president and former chief minister M K Stalin had previously alerted the state to the potential risks of delimitation, organised an all-party meeting, and established a joint action committee in Chennai alongside chief ministers and political leaders from other southern states.
-She stressed that DMK's stance remains firm and unchanged based on the resolutions unanimously adopted in the earlier all-party meeting.
-The Union govt must guarantee that the 1971 population census remains the baseline for defining parliamentary constituencies for an additional 30 years beyond 2026, backed by a constitutional amendment.
-If the overall strength of Parliament is increased, the proportional representation of Tamil Nadu (7.18%) and other southern states across both Houses must be maintained based on 1971 population ratios.
+Employees are entitled to 24 days of annual leave per calendar year.
+
+Annual leave should normally be requested at least five working days
+before the planned start date. Managers are responsible for reviewing
+leave requests and approving them based on business requirements.
+
+Employees may carry forward a maximum of 10 unused annual leave days
+from one calendar year to the next. Any unused days above the
+10-day carry-forward limit will normally expire at the end of the year.
+
+New employees joining during the year receive annual leave on a
+pro-rated basis according to their joining date.
+
+Annual leave cannot normally be converted into cash while an employee
+remains employed by the company.
+
+2. Sick Leave
+-------------
+
+Employees who are unable to work because of illness should notify
+their manager before the normal working start time on the first day
+of absence.
+
+Employees may take up to 12 days of paid sick leave per calendar year.
+
+For an absence lasting more than three consecutive working days,
+the employee must provide a medical certificate to Human Resources.
+
+Sick leave is intended for genuine illness and should not be used as
+a substitute for annual leave.
+
+3. Work From Home Policy
+------------------------
+
+Employees may work from home up to three days per week, subject to
+manager approval and team requirements.
+
+Work-from-home requests should normally be submitted at least
+one working day in advance.
+
+Employees working from home are expected to remain available during
+their normal working hours and attend scheduled meetings.
+
+Certain roles that require physical presence at a company location
+may not be eligible for the standard work-from-home arrangement.
+
+4. Core Working Hours
+---------------------
+
+The standard working day is eight hours.
+
+Core working hours are from 10:00 AM to 4:00 PM.
+
+Employees are expected to be available during core working hours
+unless they are on approved leave or have an approved alternative
+working arrangement.
+
+Teams may establish additional collaboration hours when required
+for project delivery or customer commitments.
+
+5. Parental Leave
+-----------------
+
+Employees who become parents are eligible for parental leave according
+to the applicable company policy and local employment regulations.
+
+Employees should contact Human Resources as early as possible when
+planning parental leave.
+
+The exact duration of parental leave depends on the type of leave,
+employee eligibility, and applicable local regulations.
+
+Parental leave requests should be submitted through the company's
+HR system.
+
+6. Expense Reimbursement
+------------------------
+
+Employees may claim reimbursement for approved business expenses.
+
+Expense claims must normally be submitted within 30 calendar days
+from the date of the expense.
+
+Receipts are required for individual expenses above INR 1,000.
+
+Travel expenses must comply with the company's travel and expense
+policy.
+
+Managers are responsible for reviewing and approving expense claims
+before reimbursement.
+
+Personal expenses that are not related to approved business activities
+are not eligible for reimbursement.
+
+7. Business Travel
+------------------
+
+Employees travelling for business purposes should obtain manager
+approval before booking travel.
+
+Flights and hotels should normally be booked through the company's
+approved travel platform.
+
+Economy-class air travel is the standard option for journeys shorter
+than six hours.
+
+Business-class travel may be approved for longer journeys when allowed
+by the applicable travel policy.
+
+Employees should retain receipts and supporting documentation for
+business travel expenses.
+
+8. Information Security
+-----------------------
+
+Employees must protect company information and must not share
+confidential company data with unauthorized individuals.
+
+Company passwords must not be shared with colleagues, customers,
+vendors, or other third parties.
+
+Employees must use multi-factor authentication when accessing systems
+that require it.
+
+Company laptops must be protected with the required security controls
+and should not be left unattended in public places.
+
+Security incidents or suspected data breaches must be reported to the
+Information Security team immediately.
+
+9. Password Policy
+------------------
+
+Employees must use strong passwords and must not reuse company
+passwords for personal services.
+
+Passwords must not be stored in plain-text documents or shared through
+email or chat.
+
+Where password managers are approved by the company, employees should
+use the company-approved password manager.
+
+Multi-factor authentication must be enabled for systems that support
+it.
+
+10. Remote Access
+-----------------
+
+Employees accessing company systems from outside the corporate network
+must use the approved secure access mechanism.
+
+Unauthorized remote-access software must not be installed on company
+devices.
+
+Employees must not connect company devices to untrusted public
+networks without using the required security controls.
+
+Remote access activity may be logged and monitored for security and
+compliance purposes.
+
+11. Performance Reviews
+-----------------------
+
+Employees normally participate in a formal performance review once
+per year.
+
+Managers are expected to provide regular feedback throughout the year
+and should not wait until the annual review to discuss performance
+issues.
+
+Performance discussions should include accomplishments, development
+areas, goals, and future responsibilities.
+
+Employees may discuss career development and training requirements
+with their manager during the performance review process.
+
+12. Learning and Development
+----------------------------
+
+Employees may request training related to their current role or
+future career responsibilities.
+
+Training requests should be discussed with the employee's manager
+before registration.
+
+The company may reimburse approved training costs when the training
+is relevant to business requirements and has received the required
+approval.
+
+Certification reimbursement is subject to the applicable learning
+and development policy.
+
+13. Employee Onboarding
+-----------------------
+
+New employees must complete the required onboarding activities during
+their first two weeks.
+
+Onboarding normally includes identity verification, system access,
+security training, company orientation, and role-specific training.
+
+Managers are responsible for ensuring that new employees receive the
+access and information required to perform their role.
+
+Employees should contact their manager or Human Resources if required
+onboarding activities are incomplete.
+
+14. Data Classification
+-----------------------
+
+Company information should be handled according to its sensitivity.
+
+Public information may be shared externally when appropriate.
+
+Internal information is intended primarily for employees and approved
+business partners.
+
+Confidential information must only be shared with authorized
+individuals who have a legitimate business need.
+
+Restricted information requires additional protection and may only be
+accessed by specifically authorized personnel.
+
+15. Incident Reporting
+----------------------
+
+Employees should report security incidents, suspected phishing
+messages, lost company devices, and suspected unauthorized access
+immediately.
+
+Incident reports should contain enough information for the security
+team to understand what happened, when it happened, and which systems
+or information may have been affected.
+
+Employees should not attempt to investigate or delete evidence of a
+suspected security incident unless instructed by the Security team.
+
+16. Important Contacts
+----------------------
+
+Human Resources handles questions related to leave, benefits,
+onboarding, performance reviews, and employee development.
+
+The Information Security team handles security incidents, phishing
+reports, unauthorized access, and data protection concerns.
+
+Managers handle day-to-day approvals including annual leave,
+work-from-home requests, business travel, and employee development
+requests.
+
+Employees should use the official company systems and approved
+communication channels when submitting requests or reporting issues.

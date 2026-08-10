@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, cast
+
 from logging.config import fileConfig
 
 from alembic import context
@@ -49,8 +51,10 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
 
+    section = config.get_section(config.config_ini_section) or {}
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        cast(dict[str, Any], section),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

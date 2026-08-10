@@ -44,7 +44,8 @@ def create_knowledge_base(
     service = KnowledgeBaseService(db)
 
     try:
-        return service.create(request)
+        knowledge_base = service.create(request)
+        return KnowledgeBaseResponse.model_validate(knowledge_base)
     except ValueError as ex:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -62,7 +63,11 @@ def get_knowledge_bases(
     """Return all Knowledge Bases."""
 
     service = KnowledgeBaseService(db)
-    return service.get_all()
+    knowledge_bases = service.get_all()
+    return [
+        KnowledgeBaseResponse.model_validate(knowledge_base)
+        for knowledge_base in knowledge_bases
+    ]
 
 
 @router.get(
@@ -78,7 +83,8 @@ def get_knowledge_base(
     service = KnowledgeBaseService(db)
 
     try:
-        return service.get_by_id(knowledge_base_id)
+        knowledge_base = service.get_by_id(knowledge_base_id)
+        return KnowledgeBaseResponse.model_validate(knowledge_base)
     except ValueError as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -100,10 +106,11 @@ def update_knowledge_base(
     service = KnowledgeBaseService(db)
 
     try:
-        return service.update(
+        knowledge_base = service.update(
             knowledge_base_id,
             request,
         )
+        return KnowledgeBaseResponse.model_validate(knowledge_base)
     except ValueError as ex:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

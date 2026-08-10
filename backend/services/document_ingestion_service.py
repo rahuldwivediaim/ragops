@@ -88,10 +88,13 @@ class DocumentIngestionService:
             result = self._pipeline.execute(processing_context)
 
             if result.failed:
-                raise result.exception
+                if result.exception is not None:
+                    raise result.exception
+
+                raise RuntimeError("Document processing failed without an exception.")
 
             if processing_context.parsing_metadata is not None:
-                self._parsing_metadata_repository.add(
+                self._parsing_metadata_repository.create(
                     processing_context.parsing_metadata
                 )
 

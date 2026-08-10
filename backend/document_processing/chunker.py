@@ -7,10 +7,27 @@ overlapping chunks for downstream processing.
 
 from __future__ import annotations
 
+from typing import Protocol
+
 from backend.document_processing.models import (
     Chunk,
     ParsedDocument,
 )
+
+
+class Chunker(Protocol):
+    """
+    Contract for document chunkers.
+    """
+
+    def chunk_document(
+        self,
+        document: ParsedDocument,
+    ) -> list[Chunk]:
+        """
+        Split a parsed document into chunks.
+        """
+        ...
 
 
 class TextChunker:
@@ -113,5 +130,6 @@ class TextChunker:
 
 
 __all__ = [
+    "Chunker",
     "TextChunker",
 ]

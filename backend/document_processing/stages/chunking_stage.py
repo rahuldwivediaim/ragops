@@ -16,7 +16,7 @@ Persistence is handled by the ingestion service.
 
 from __future__ import annotations
 
-from backend.document_processing.chunkers.chunker import Chunker
+from backend.document_processing.chunker import Chunker
 from backend.document_processing.pipeline import (
     ProcessingContext,
     ProcessingStage,
