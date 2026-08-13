@@ -28,9 +28,7 @@ def test_faiss_provider() -> None:
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",

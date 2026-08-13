@@ -34,9 +34,7 @@ def test_pinecone_index_stats() -> None:
         "default",
     )
 
-    assert api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert api_key, "PINECONE_API_KEY is not configured in .env."
 
     client = Pinecone(
         api_key=api_key,
@@ -64,9 +62,7 @@ def test_pinecone_index_stats() -> None:
         if namespace_statistics is None:
             record_count = 0
         else:
-            record_count = int(
-                namespace_statistics.vector_count
-            )
+            record_count = int(namespace_statistics.vector_count)
 
         print(f"Record Count: {record_count}")
         print("=" * 80)

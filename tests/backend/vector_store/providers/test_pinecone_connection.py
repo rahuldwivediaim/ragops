@@ -23,9 +23,7 @@ def test_pinecone_connection_lifecycle() -> None:
 
     api_key = os.getenv("PINECONE_API_KEY")
 
-    assert api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert api_key, "PINECONE_API_KEY is not configured in .env."
 
     client = Pinecone(
         api_key=api_key,

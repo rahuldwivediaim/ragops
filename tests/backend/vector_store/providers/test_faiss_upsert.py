@@ -24,9 +24,7 @@ def test_faiss_batch_upsert() -> None:
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",
@@ -65,9 +63,7 @@ def test_faiss_batch_upsert() -> None:
     # --------------------------------------------------------------
 
     for index, embedding in enumerate(embeddings):
-        vector_id = (
-            f"rag-emp-001-version-1-chunk-{index + 1:03d}"
-        )
+        vector_id = f"rag-emp-001-version-1-chunk-{index + 1:03d}"
 
         metadata = {
             "document_id": "RAG-EMP-001",
@@ -105,14 +101,10 @@ def test_faiss_batch_upsert() -> None:
 
     assert results
 
-    result_ids = {
-        result["vector_id"]
-        for result in results
-    }
+    result_ids = {result["vector_id"] for result in results}
 
     expected_ids = {
-        f"rag-emp-001-version-1-chunk-{index + 1:03d}"
-        for index in range(len(chunks))
+        f"rag-emp-001-version-1-chunk-{index + 1:03d}" for index in range(len(chunks))
     }
 
     assert result_ids == expected_ids
@@ -124,13 +116,9 @@ def test_faiss_batch_upsert() -> None:
         assert metadata["document_version_id"] == "1"
         assert metadata["filename"] == "sample.txt"
 
-        assert metadata["provider"] == (
-            embedding_provider.provider_name
-        )
+        assert metadata["provider"] == (embedding_provider.provider_name)
 
-        assert metadata["model_name"] == (
-            embedding_provider.model_name
-        )
+        assert metadata["model_name"] == (embedding_provider.model_name)
 
         assert "chunk_id" in metadata
         assert "chunk_number" in metadata
@@ -148,12 +136,8 @@ def test_faiss_batch_upsert() -> None:
     print(f"Embeddings       : {len(embeddings)}")
     print(f"FAISS vectors    : {vector_store.count()}")
     print(f"Dimensions       : {vector_store.dimensions}")
-    print(
-        f"Provider         : {embedding_provider.provider_name}"
-    )
-    print(
-        f"Model            : {embedding_provider.model_name}"
-    )
+    print(f"Provider         : {embedding_provider.provider_name}")
+    print(f"Model            : {embedding_provider.model_name}")
 
     print("\nSample stored metadata")
     print("-" * 80)

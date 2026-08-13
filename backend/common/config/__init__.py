@@ -1,7 +1,7 @@
 """
 Configuration Package
 
-Provides a singleton ConfigurationManager instance for the application.
+Provides the singleton ConfigurationManager instance for the application.
 
 Purpose
 -------
@@ -17,11 +17,13 @@ settings = configuration.settings
 
 from __future__ import annotations
 
+from .domains import DomainConfig
 from .manager import ConfigurationManager
 
 configuration = ConfigurationManager()
 
 __all__ = [
     "ConfigurationManager",
+    "DomainConfig",
     "configuration",
 ]

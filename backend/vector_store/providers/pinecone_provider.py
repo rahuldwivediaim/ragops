@@ -27,14 +27,10 @@ class PineconeProvider(BaseVectorStore):
         namespace: str = "default",
     ) -> None:
         if not api_key:
-            raise ValueError(
-                "Pinecone API key cannot be empty."
-            )
+            raise ValueError("Pinecone API key cannot be empty.")
 
         if not index_name:
-            raise ValueError(
-                "Pinecone index name cannot be empty."
-            )
+            raise ValueError("Pinecone index name cannot be empty.")
 
         self._client = Pinecone(
             api_key=api_key,
@@ -88,14 +84,10 @@ class PineconeProvider(BaseVectorStore):
         """
 
         if not vector_id:
-            raise ValueError(
-                "vector_id cannot be empty."
-            )
+            raise ValueError("vector_id cannot be empty.")
 
         if not vector:
-            raise ValueError(
-                "vector cannot be empty."
-            )
+            raise ValueError("vector cannot be empty.")
 
         self._index.upsert(
             vectors=[
@@ -107,7 +99,7 @@ class PineconeProvider(BaseVectorStore):
             ],
             namespace=self._namespace,
         )
-    
+
     def upsert_batch(
         self,
         vectors: list[dict[str, Any]],
@@ -130,9 +122,7 @@ class PineconeProvider(BaseVectorStore):
             metadata = vector.get("metadata")
 
             if not vector_id:
-                raise ValueError(
-                    "Each vector must contain a non-empty 'id'."
-                )
+                raise ValueError("Each vector must contain a non-empty 'id'.")
 
             if not values:
                 raise ValueError(
@@ -140,9 +130,7 @@ class PineconeProvider(BaseVectorStore):
                 )
 
             if metadata is None:
-                raise ValueError(
-                    f"Vector '{vector_id}' must contain 'metadata'."
-                )
+                raise ValueError(f"Vector '{vector_id}' must contain 'metadata'.")
 
         self._index.upsert(
             vectors=vectors,
@@ -176,14 +164,10 @@ class PineconeProvider(BaseVectorStore):
         """
 
         if not vector:
-            raise ValueError(
-                "vector cannot be empty."
-            )
+            raise ValueError("vector cannot be empty.")
 
         if top_k <= 0:
-            raise ValueError(
-                "top_k must be greater than zero."
-            )
+            raise ValueError("top_k must be greater than zero.")
 
         response = self._index.query(
             vector=vector,
@@ -200,9 +184,7 @@ class PineconeProvider(BaseVectorStore):
                 {
                     "vector_id": match.id,
                     "score": float(match.score),
-                    "metadata": dict(
-                        match.metadata or {}
-                    ),
+                    "metadata": dict(match.metadata or {}),
                 }
             )
 
@@ -226,9 +208,7 @@ class PineconeProvider(BaseVectorStore):
         if namespace_statistics is None:
             return 0
 
-        return int(
-            namespace_statistics.vector_count
-        )
+        return int(namespace_statistics.vector_count)
 
     def close(
         self,

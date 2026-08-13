@@ -27,9 +27,7 @@ def test_pinecone_index_lifecycle() -> None:
         "ragframeworkdev",
     )
 
-    assert api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert api_key, "PINECONE_API_KEY is not configured in .env."
 
     client = Pinecone(
         api_key=api_key,

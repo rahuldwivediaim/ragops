@@ -8,6 +8,13 @@ from pydantic import Field
 
 from .base import BaseConfig
 
+from .authorization import (
+    AccessPolicyConfig,
+    DevelopmentUserConfig,
+    PermissionConfig,
+    RoleConfig,
+)
+
 
 class JWTConfig(BaseConfig):
     algorithm: str = "HS256"
@@ -48,6 +55,26 @@ class AuthenticationConfig(BaseConfig):
 
 
 class AuthorizationConfig(BaseConfig):
+    """Application authorization configuration."""
+
     enabled: bool = True
     rbac: bool = True
     default_role: str = "user"
+
+    permissions: dict[str, PermissionConfig] = Field(default_factory=dict)
+    roles: dict[str, RoleConfig] = Field(default_factory=dict)
+    policies: dict[str, AccessPolicyConfig] = Field(default_factory=dict)
+    development_users: dict[str, DevelopmentUserConfig] = Field(
+        default_factory=dict,
+    )
+
+
+__all__ = [
+    "APIKeyConfig",
+    "AuthenticationConfig",
+    "AuthorizationConfig",
+    "CORSConfig",
+    "CookieConfig",
+    "EncryptionConfig",
+    "JWTConfig",
+]

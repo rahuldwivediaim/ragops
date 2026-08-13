@@ -33,9 +33,7 @@ class FAISSProvider(BaseVectorStore):
         dimensions: int | None = None,
     ) -> None:
         if dimensions is not None and dimensions <= 0:
-            raise ValueError(
-                "dimensions must be greater than zero."
-            )
+            raise ValueError("dimensions must be greater than zero.")
 
         self._dimensions = dimensions
         self._index: faiss.Index | None = None
@@ -68,9 +66,7 @@ class FAISSProvider(BaseVectorStore):
         """
 
         if dimensions <= 0:
-            raise ValueError(
-                "Vector dimensions must be greater than zero."
-            )
+            raise ValueError("Vector dimensions must be greater than zero.")
 
         if self._dimensions is None:
             self._dimensions = dimensions
@@ -95,9 +91,7 @@ class FAISSProvider(BaseVectorStore):
         """
 
         if not vector:
-            raise ValueError(
-                "Vector cannot be empty."
-            )
+            raise ValueError("Vector cannot be empty.")
 
         array = np.asarray(
             vector,
@@ -123,9 +117,7 @@ class FAISSProvider(BaseVectorStore):
         """
 
         if not vector_id:
-            raise ValueError(
-                "vector_id cannot be empty."
-            )
+            raise ValueError("vector_id cannot be empty.")
 
         if vector_id in self._vector_ids:
             self.delete([vector_id])
@@ -135,9 +127,7 @@ class FAISSProvider(BaseVectorStore):
         )
 
         if self._index is None:
-            raise RuntimeError(
-                "FAISS index has not been initialized."
-            )
+            raise RuntimeError("FAISS index has not been initialized.")
 
         self._index.add(normalized_vector)
 
@@ -178,13 +168,9 @@ class FAISSProvider(BaseVectorStore):
                 len(self._vector_ids),
             )
 
-            for index, vector_id in enumerate(
-                self._vector_ids
-            ):
+            for index, vector_id in enumerate(self._vector_ids):
                 if vector_id not in ids_to_delete:
-                    remaining_vectors.append(
-                        stored_vectors[index].tolist()
-                    )
+                    remaining_vectors.append(stored_vectors[index].tolist())
 
         self._vector_ids = remaining_ids
 
@@ -210,9 +196,7 @@ class FAISSProvider(BaseVectorStore):
             faiss.normalize_L2(vectors)
 
             if self._index is None:
-                raise RuntimeError(
-                    "FAISS index has not been initialized."
-                )
+                raise RuntimeError("FAISS index has not been initialized.")
 
             self._index.add(vectors)
 
@@ -229,9 +213,7 @@ class FAISSProvider(BaseVectorStore):
         """
 
         if top_k <= 0:
-            raise ValueError(
-                "top_k must be greater than zero."
-            )
+            raise ValueError("top_k must be greater than zero.")
 
         if self._index is None or not self._vector_ids:
             return []
@@ -241,9 +223,7 @@ class FAISSProvider(BaseVectorStore):
         )
 
         if self._index is None:
-            raise RuntimeError(
-                "FAISS index has not been initialized."
-            )
+            raise RuntimeError("FAISS index has not been initialized.")
 
         limit = min(
             top_k,
@@ -296,10 +276,7 @@ class FAISSProvider(BaseVectorStore):
         Check whether metadata satisfies a simple equality filter.
         """
 
-        return all(
-            metadata.get(key) == value
-            for key, value in metadata_filter.items()
-        )
+        return all(metadata.get(key) == value for key, value in metadata_filter.items())
 
     def count(self) -> int:
         """

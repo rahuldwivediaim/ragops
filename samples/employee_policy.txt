@@ -1,0 +1,35 @@
+RAGFramework Employee Policy
+============================
+
+Document ID: EMP-POL-001
+Domain: Employee Policies
+Knowledge Base: employee_knowledge_base
+Classification: INTERNAL
+Department: HR
+
+1. Annual Leave
+Employees are entitled to 24 days of annual leave per calendar year.
+Up to 5 unused annual leave days may be carried forward to the following
+calendar year.
+
+2. Sick Leave
+Employees may take sick leave according to company policy and applicable
+employment regulations.
+
+3. Work From Home
+Employees may work from home subject to manager approval and applicable
+team policies. Employees working from home must remain available during
+normal working hours.
+
+4. Travel Approval
+Employee travel requests must be submitted through the company travel
+request process. The employee's reporting manager must approve the request
+before travel is booked.
+
+5. Employee Benefits
+Employees are eligible for benefits according to their employment category
+and applicable company policies.
+
+6. HR Restricted Information
+Compensation, employee disciplinary records and other confidential employee
+information may only be accessed by specifically authorized HR personnel.

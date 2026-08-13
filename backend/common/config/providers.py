@@ -11,6 +11,7 @@ from pydantic import AnyHttpUrl, Field
 from backend.common.enums import (
     EmbeddingProvider,
     LLMProvider,
+    RerankerProvider,
     VectorStore,
 )
 
@@ -46,7 +47,7 @@ class VectorStoreConfig(ProviderConfig):
 
 
 class RerankerProviderConfig(ProviderConfig):
-    provider: LLMProvider
+    provider: RerankerProvider
     model: str
 
 

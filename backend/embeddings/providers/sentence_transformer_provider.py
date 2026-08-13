@@ -28,7 +28,6 @@ class SentenceTransformerProvider(BaseEmbeddingProvider):
         self,
         model_name: str = "all-MiniLM-L6-v2",
     ) -> None:
-
         # Prevent Windows symlink warning from Hugging Face.
         os.environ.setdefault(
             "HF_HUB_DISABLE_SYMLINKS_WARNING",

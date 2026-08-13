@@ -35,13 +35,9 @@ def test_pinecone_upsert() -> None:
     openai_api_key = os.getenv("OPENAI_API_KEY")
     pinecone_api_key = os.getenv("PINECONE_API_KEY")
 
-    assert openai_api_key, (
-        "OPENAI_API_KEY is not configured in .env."
-    )
+    assert openai_api_key, "OPENAI_API_KEY is not configured in .env."
 
-    assert pinecone_api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert pinecone_api_key, "PINECONE_API_KEY is not configured in .env."
 
     model_name = os.getenv(
         "OPENAI_EMBEDDING_MODEL",
@@ -52,11 +48,7 @@ def test_pinecone_upsert() -> None:
         "OPENAI_EMBEDDING_DIMENSIONS",
     )
 
-    dimensions = (
-        int(dimensions_value)
-        if dimensions_value
-        else None
-    )
+    dimensions = int(dimensions_value) if dimensions_value else None
 
     index_name = os.getenv(
         "PINECONE_INDEX",
@@ -70,9 +62,7 @@ def test_pinecone_upsert() -> None:
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",
@@ -111,9 +101,7 @@ def test_pinecone_upsert() -> None:
         # Step 3: Create a unique vector ID
         # ----------------------------------------------------------
 
-        vector_id = (
-            f"test-document-{uuid.uuid4().hex}"
-        )
+        vector_id = f"test-document-{uuid.uuid4().hex}"
 
         metadata = {
             "document_id": "sample-document",
@@ -123,9 +111,7 @@ def test_pinecone_upsert() -> None:
             "filename": sample_file.name,
             "provider": embedding_result.provider,
             "model_name": embedding_result.model_name,
-            "embedding_version": (
-                embedding_result.embedding_version
-            ),
+            "embedding_version": (embedding_result.embedding_version),
         }
 
         # ----------------------------------------------------------
@@ -146,35 +132,17 @@ def test_pinecone_upsert() -> None:
         print("Pinecone Upsert Test")
         print("=" * 100)
 
-        print(
-            f"Provider        : "
-            f"{vector_store.provider_name}"
-        )
+        print(f"Provider        : {vector_store.provider_name}")
 
-        print(
-            f"Index           : "
-            f"{vector_store.index_name}"
-        )
+        print(f"Index           : {vector_store.index_name}")
 
-        print(
-            f"Namespace       : "
-            f"{vector_store.namespace}"
-        )
+        print(f"Namespace       : {vector_store.namespace}")
 
-        print(
-            f"Embedding Model : "
-            f"{embedding_result.model_name}"
-        )
+        print(f"Embedding Model : {embedding_result.model_name}")
 
-        print(
-            f"Dimensions      : "
-            f"{embedding_result.dimensions}"
-        )
+        print(f"Dimensions      : {embedding_result.dimensions}")
 
-        print(
-            f"Vector ID       : "
-            f"{vector_id}"
-        )
+        print(f"Vector ID       : {vector_id}")
 
         print("\nMetadata")
         print("-" * 100)
@@ -185,14 +153,9 @@ def test_pinecone_upsert() -> None:
         print("\nStatus")
         print("-" * 100)
 
-        print(
-            "Vector successfully submitted "
-            "to Pinecone."
-        )
+        print("Vector successfully submitted to Pinecone.")
 
-        print(
-            "The vector is intentionally NOT deleted."
-        )
+        print("The vector is intentionally NOT deleted.")
 
         print("=" * 100)
 

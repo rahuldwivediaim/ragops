@@ -1,6 +1,6 @@
 # ADR-0008: Chunk Store as Source of Truth with Transactional Vector Synchronization
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-08-10
 
 ---

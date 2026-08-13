@@ -42,13 +42,9 @@ def test_pinecone_batch_upsert() -> None:
 
     openai_api_key = os.getenv("OPENAI_API_KEY")
 
-    assert pinecone_api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert pinecone_api_key, "PINECONE_API_KEY is not configured in .env."
 
-    assert openai_api_key, (
-        "OPENAI_API_KEY is not configured in .env."
-    )
+    assert openai_api_key, "OPENAI_API_KEY is not configured in .env."
 
     # --------------------------------------------------------------
     # Step 1: Load sample document
@@ -56,17 +52,13 @@ def test_pinecone_batch_upsert() -> None:
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",
     )
 
-    assert text.strip(), (
-        f"Sample file is empty: {sample_file}"
-    )
+    assert text.strip(), f"Sample file is empty: {sample_file}"
 
     # --------------------------------------------------------------
     # Step 2: Chunk document
@@ -97,8 +89,7 @@ def test_pinecone_batch_upsert() -> None:
         )
 
         assert len(embeddings) == len(chunks), (
-            "Number of embeddings does not match "
-            "number of chunks."
+            "Number of embeddings does not match number of chunks."
         )
 
         # ----------------------------------------------------------
@@ -123,23 +114,17 @@ def test_pinecone_batch_upsert() -> None:
             for index, embedding in enumerate(embeddings):
                 chunk_number = index + 1
 
-                vector_id = (
-                    f"rag-emp-001-version-1-"
-                    f"chunk-{chunk_number:03d}"
-                )
+                vector_id = f"rag-emp-001-version-1-chunk-{chunk_number:03d}"
 
                 metadata = {
                     "document_id": "RAG-EMP-001",
                     "document_version_id": "1",
-                    "chunk_id": (
-                        f"chunk-{chunk_number:03d}"
-                    ),
+                    "chunk_id": (f"chunk-{chunk_number:03d}"),
                     "chunk_number": chunk_number,
                     "filename": sample_file.name,
                     "provider": embedding.provider,
                     "model_name": embedding.model_name,
                     "embedding_version": "1",
-
                     # Store the actual chunk text.
                     "text": chunks[index],
                 }
@@ -165,29 +150,19 @@ def test_pinecone_batch_upsert() -> None:
 
                 metadata = vector["metadata"]
 
-                assert metadata["document_id"] == (
-                    "RAG-EMP-001"
-                )
+                assert metadata["document_id"] == ("RAG-EMP-001")
 
                 assert metadata["document_version_id"] == "1"
 
-                assert metadata["chunk_id"] == (
-                    f"chunk-{index + 1:03d}"
-                )
+                assert metadata["chunk_id"] == (f"chunk-{index + 1:03d}")
 
-                assert metadata["chunk_number"] == (
-                    index + 1
-                )
+                assert metadata["chunk_number"] == (index + 1)
 
-                assert metadata["filename"] == (
-                    "sample.txt"
-                )
+                assert metadata["filename"] == ("sample.txt")
 
                 assert metadata["provider"] == "openai"
 
-                assert metadata["model_name"] == (
-                    "text-embedding-3-small"
-                )
+                assert metadata["model_name"] == ("text-embedding-3-small")
 
                 assert metadata["embedding_version"] == "1"
 
@@ -228,27 +203,19 @@ def test_pinecone_batch_upsert() -> None:
             )
 
             assert len(results) == len(vectors), (
-                f"Expected {len(vectors)} query results but "
-                f"received {len(results)}."
+                f"Expected {len(vectors)} query results but received {len(results)}."
             )
 
             # ------------------------------------------------------
             # Step 10: Verify vector IDs
             # ------------------------------------------------------
 
-            result_ids = {
-                result["vector_id"]
-                for result in results
-            }
+            result_ids = {result["vector_id"] for result in results}
 
-            expected_ids = {
-                vector["id"]
-                for vector in vectors
-            }
+            expected_ids = {vector["id"] for vector in vectors}
 
             assert result_ids == expected_ids, (
-                "Returned vector IDs do not match the "
-                "vectors that were submitted."
+                "Returned vector IDs do not match the vectors that were submitted."
             )
 
             # ------------------------------------------------------
@@ -260,9 +227,7 @@ def test_pinecone_batch_upsert() -> None:
             for result in results:
                 metadata = result["metadata"]
 
-                assert metadata["document_id"] == (
-                    "RAG-EMP-001"
-                )
+                assert metadata["document_id"] == ("RAG-EMP-001")
 
                 assert metadata["document_version_id"] == "1"
 
@@ -270,9 +235,7 @@ def test_pinecone_batch_upsert() -> None:
 
                 assert metadata["provider"] == "openai"
 
-                assert metadata["model_name"] == (
-                    "text-embedding-3-small"
-                )
+                assert metadata["model_name"] == ("text-embedding-3-small")
 
                 assert metadata["embedding_version"] == "1"
 
@@ -285,9 +248,7 @@ def test_pinecone_batch_upsert() -> None:
 
                 chunk_number = metadata["chunk_number"]
 
-                results_by_chunk_number[
-                    chunk_number
-                ] = result
+                results_by_chunk_number[chunk_number] = result
 
             # ------------------------------------------------------
             # Step 12: Verify every chunk has the correct text
@@ -299,19 +260,13 @@ def test_pinecone_batch_upsert() -> None:
                 chunks,
                 start=1,
             ):
-                assert chunk_number in (
-                    results_by_chunk_number
-                )
+                assert chunk_number in (results_by_chunk_number)
 
-                result = results_by_chunk_number[
-                    chunk_number
-                ]
+                result = results_by_chunk_number[chunk_number]
 
                 metadata = result["metadata"]
 
-                assert metadata["chunk_id"] == (
-                    f"chunk-{chunk_number:03d}"
-                )
+                assert metadata["chunk_id"] == (f"chunk-{chunk_number:03d}")
 
                 assert metadata["text"] == chunk
 
@@ -323,65 +278,32 @@ def test_pinecone_batch_upsert() -> None:
             print("Pinecone Batch Upsert Test")
             print("=" * 80)
 
-            print(
-                f"Index              : "
-                f"{pinecone_index_name}"
-            )
+            print(f"Index              : {pinecone_index_name}")
 
-            print(
-                f"Namespace          : "
-                f"{namespace}"
-            )
+            print(f"Namespace          : {namespace}")
 
-            print(
-                f"Chunks             : "
-                f"{len(chunks)}"
-            )
+            print(f"Chunks             : {len(chunks)}")
 
-            print(
-                f"Embeddings         : "
-                f"{len(embeddings)}"
-            )
+            print(f"Embeddings         : {len(embeddings)}")
 
-            print(
-                f"Vectors submitted  : "
-                f"{len(vectors)}"
-            )
+            print(f"Vectors submitted  : {len(vectors)}")
 
-            print(
-                f"Vectors stored     : "
-                f"{stored_count}"
-            )
+            print(f"Vectors stored     : {stored_count}")
 
-            print(
-                "Embedding provider : "
-                "openai"
-            )
+            print("Embedding provider : openai")
 
-            print(
-                "Embedding model    : "
-                "text-embedding-3-small"
-            )
+            print("Embedding model    : text-embedding-3-small")
 
-            print(
-                "Dimensions         : "
-                "1536"
-            )
+            print("Dimensions         : 1536")
 
-            print(
-                "Chunk text stored  : "
-                "YES"
-            )
+            print("Chunk text stored  : YES")
 
             print("\nSample vector metadata")
             print("-" * 80)
 
             sample_result = results_by_chunk_number[1]
 
-            print(
-                f"Vector ID : "
-                f"{sample_result['vector_id']}"
-            )
+            print(f"Vector ID : {sample_result['vector_id']}")
 
             sample_metadata = sample_result["metadata"]
 
@@ -391,20 +313,11 @@ def test_pinecone_batch_upsert() -> None:
                     text_value = str(value)
 
                     if len(text_value) > 120:
-                        text_value = (
-                            text_value[:120]
-                            + "..."
-                        )
+                        text_value = text_value[:120] + "..."
 
-                    print(
-                        f"{key:<22}: "
-                        f"{text_value}"
-                    )
+                    print(f"{key:<22}: {text_value}")
                 else:
-                    print(
-                        f"{key:<22}: "
-                        f"{value}"
-                    )
+                    print(f"{key:<22}: {value}")
 
             print("\nStatus               : PASSED")
             print("=" * 80)

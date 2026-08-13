@@ -40,17 +40,11 @@ def test_openai_embedding_provider() -> None:
         "OPENAI_EMBEDDING_DIMENSIONS",
     )
 
-    dimensions = (
-        int(dimensions_value)
-        if dimensions_value
-        else None
-    )
+    dimensions = int(dimensions_value) if dimensions_value else None
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",

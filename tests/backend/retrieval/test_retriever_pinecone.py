@@ -47,13 +47,9 @@ def test_retriever_pinecone() -> None:
         "ragframeworkdev",
     )
 
-    assert openai_api_key, (
-        "OPENAI_API_KEY is not configured in .env."
-    )
+    assert openai_api_key, "OPENAI_API_KEY is not configured in .env."
 
-    assert pinecone_api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert pinecone_api_key, "PINECONE_API_KEY is not configured in .env."
 
     # --------------------------------------------------------------
     # Create providers
@@ -85,10 +81,7 @@ def test_retriever_pinecone() -> None:
         # Query
         # ----------------------------------------------------------
 
-        query = (
-            "What is the purpose of the employee "
-            "leave policy?"
-        )
+        query = "What is the purpose of the employee leave policy?"
 
         # ----------------------------------------------------------
         # Execute production retrieval function
@@ -103,9 +96,7 @@ def test_retriever_pinecone() -> None:
         # Verify results
         # ----------------------------------------------------------
 
-        assert results, (
-            "Retriever returned no results."
-        )
+        assert results, "Retriever returned no results."
 
         assert len(results) <= 3
 
@@ -119,9 +110,7 @@ def test_retriever_pinecone() -> None:
 
             metadata = result["metadata"]
 
-            assert metadata, (
-                "Retrieved result contains no metadata."
-            )
+            assert metadata, "Retrieved result contains no metadata."
 
             assert "document_id" in metadata
             assert "document_version_id" in metadata
@@ -143,21 +132,13 @@ def test_retriever_pinecone() -> None:
         print("Retriever + Pinecone Test")
         print("=" * 80)
 
-        print(
-            f"Index       : {pinecone_index_name}"
-        )
+        print(f"Index       : {pinecone_index_name}")
 
-        print(
-            "Namespace   : batch-test"
-        )
+        print("Namespace   : batch-test")
 
-        print(
-            f"Query       : {query}"
-        )
+        print(f"Query       : {query}")
 
-        print(
-            f"Results     : {len(results)}"
-        )
+        print(f"Results     : {len(results)}")
 
         print("\nRetrieved Results")
         print("-" * 80)
@@ -168,50 +149,25 @@ def test_retriever_pinecone() -> None:
         ):
             metadata = result["metadata"]
 
-            chunk_text = str(
-                metadata["text"]
-            ).replace("\n", " ")
+            chunk_text = str(metadata["text"]).replace("\n", " ")
 
             # Avoid huge console output.
             if len(chunk_text) > 120:
-                chunk_text = (
-                    chunk_text[:120]
-                    + "..."
-                )
+                chunk_text = chunk_text[:120] + "..."
 
-            print(
-                f"Result #{index}"
-            )
+            print(f"Result #{index}")
 
-            print(
-                f"  Score      : "
-                f"{result['score']:.6f}"
-            )
+            print(f"  Score      : {result['score']:.6f}")
 
-            print(
-                f"  Vector ID  : "
-                f"{result['vector_id']}"
-            )
+            print(f"  Vector ID  : {result['vector_id']}")
 
-            print(
-                f"  Chunk ID   : "
-                f"{metadata['chunk_id']}"
-            )
+            print(f"  Chunk ID   : {metadata['chunk_id']}")
 
-            print(
-                f"  Chunk No.  : "
-                f"{metadata['chunk_number']}"
-            )
+            print(f"  Chunk No.  : {metadata['chunk_number']}")
 
-            print(
-                f"  Filename   : "
-                f"{metadata['filename']}"
-            )
+            print(f"  Filename   : {metadata['filename']}")
 
-            print(
-                f"  Text       : "
-                f"{chunk_text}"
-            )
+            print(f"  Text       : {chunk_text}")
 
         print("\nStatus      : PASSED")
         print("=" * 80)

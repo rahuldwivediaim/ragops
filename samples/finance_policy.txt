@@ -1,0 +1,33 @@
+RAGFramework Finance Policy
+===========================
+
+Document ID: FIN-POL-001
+Domain: Finance Policies
+Knowledge Base: finance_knowledge_base
+Classification: INTERNAL
+Department: Finance
+
+1. Business Travel Expenses
+Employees may claim eligible business travel expenses according to the
+company expense policy.
+
+2. Travel Expense Approval
+Travel expenses must be submitted through the expense management system.
+Expenses above the applicable approval threshold require Finance Manager
+approval.
+
+3. Reimbursement
+Approved business expenses are reimbursed through the company's standard
+expense processing cycle.
+
+4. Expense Documentation
+Employees must provide appropriate receipts and supporting documentation
+for reimbursable expenses.
+
+5. Financial Controls
+Finance personnel are responsible for reviewing expenses for compliance
+with company financial controls.
+
+6. Restricted Financial Information
+Financial forecasts, budgets and other restricted financial information may
+only be accessed by specifically authorized Finance personnel.

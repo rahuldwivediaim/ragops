@@ -32,13 +32,9 @@ def test_pinecone_query() -> None:
     openai_api_key = os.getenv("OPENAI_API_KEY")
     pinecone_api_key = os.getenv("PINECONE_API_KEY")
 
-    assert openai_api_key, (
-        "OPENAI_API_KEY is not configured in .env."
-    )
+    assert openai_api_key, "OPENAI_API_KEY is not configured in .env."
 
-    assert pinecone_api_key, (
-        "PINECONE_API_KEY is not configured in .env."
-    )
+    assert pinecone_api_key, "PINECONE_API_KEY is not configured in .env."
 
     model_name = os.getenv(
         "OPENAI_EMBEDDING_MODEL",
@@ -49,11 +45,7 @@ def test_pinecone_query() -> None:
         "OPENAI_EMBEDDING_DIMENSIONS",
     )
 
-    dimensions = (
-        int(dimensions_value)
-        if dimensions_value
-        else None
-    )
+    dimensions = int(dimensions_value) if dimensions_value else None
 
     index_name = os.getenv(
         "PINECONE_INDEX",
@@ -67,9 +59,7 @@ def test_pinecone_query() -> None:
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",
@@ -114,9 +104,7 @@ def test_pinecone_query() -> None:
         print(f"Index           : {index_name}")
         print(f"Namespace       : {namespace}")
         print(f"Query Model     : {model_name}")
-        print(
-            f"Query Dimensions: {embedding_result.dimensions}"
-        )
+        print(f"Query Dimensions: {embedding_result.dimensions}")
         print(f"Results Found   : {len(results)}")
 
         print("\nQuery Results")
@@ -140,9 +128,7 @@ def test_pinecone_query() -> None:
         # Assertions
         # ----------------------------------------------------------
 
-        assert results, (
-            "No vectors were returned from Pinecone."
-        )
+        assert results, "No vectors were returned from Pinecone."
 
         assert len(results) <= 3
 

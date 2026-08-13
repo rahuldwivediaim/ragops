@@ -14,6 +14,7 @@ from .base import (
     HealthCheckConfig,
     PathConfig,
 )
+from .domains import DomainConfig
 from .environment import Environment, get_environment
 from .logging import LoggingConfig
 from .providers import (
@@ -61,6 +62,8 @@ class ApplicationSettings(BaseConfig):
     ocr: OCRProviderConfig | None = None
     speech: SpeechProviderConfig | None = None
     storage_root: str = "storage"
+
+    domains: dict[str, DomainConfig] = Field(default_factory=dict)
 
 
 __all__ = [

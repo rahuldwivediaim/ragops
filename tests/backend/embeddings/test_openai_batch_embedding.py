@@ -27,9 +27,7 @@ def test_openai_batch_embedding() -> None:
 
     api_key = os.getenv("OPENAI_API_KEY")
 
-    assert api_key, (
-        "OPENAI_API_KEY is not configured in .env."
-    )
+    assert api_key, "OPENAI_API_KEY is not configured in .env."
 
     texts = [
         "Employees are entitled to annual leave.",
@@ -52,9 +50,7 @@ def test_openai_batch_embedding() -> None:
 
         for result in results:
             assert result.provider == "openai"
-            assert result.model_name == (
-                "text-embedding-3-small"
-            )
+            assert result.model_name == ("text-embedding-3-small")
             assert result.dimensions == 1536
             assert len(result.vector) == 1536
             assert result.embedding_version == 1
@@ -63,37 +59,19 @@ def test_openai_batch_embedding() -> None:
         print("OpenAI Batch Embedding Test")
         print("=" * 80)
 
-        print(
-            f"Input texts          : {len(texts)}"
-        )
+        print(f"Input texts          : {len(texts)}")
 
-        print(
-            f"Embeddings generated : {len(results)}"
-        )
+        print(f"Embeddings generated : {len(results)}")
 
-        print(
-            f"Provider             : "
-            f"{provider.provider_name}"
-        )
+        print(f"Provider             : {provider.provider_name}")
 
-        print(
-            f"Model                : "
-            f"{provider.model_name}"
-        )
+        print(f"Model                : {provider.model_name}")
 
-        print(
-            f"Dimensions           : "
-            f"{results[0].dimensions}"
-        )
+        print(f"Dimensions           : {results[0].dimensions}")
 
-        print(
-            "Batch request        : "
-            "YES"
-        )
+        print("Batch request        : YES")
 
-        print(
-            "\nStatus               : PASSED"
-        )
+        print("\nStatus               : PASSED")
 
         print("=" * 80)
 

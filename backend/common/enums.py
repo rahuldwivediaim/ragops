@@ -130,6 +130,13 @@ class LLMProvider(StrEnum):
     GROQ = "groq"
 
 
+class RerankerProvider(StrEnum):
+    """Supported reranking providers."""
+
+    SENTENCE_TRANSFORMERS = "sentence_transformers"
+    COHERE = "cohere"
+
+
 class AuthenticationType(StrEnum):
     """Authentication mechanisms."""
 

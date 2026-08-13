@@ -23,9 +23,7 @@ def test_sentence_transformer_batch_embedding() -> None:
 
     sample_file = Path("samples/sample.txt")
 
-    assert sample_file.exists(), (
-        f"Sample file not found: {sample_file}"
-    )
+    assert sample_file.exists(), f"Sample file not found: {sample_file}"
 
     text = sample_file.read_text(
         encoding="utf-8",
@@ -70,13 +68,9 @@ def test_sentence_transformer_batch_embedding() -> None:
     assert len(results) == len(chunks)
 
     for result in results:
-        assert result.provider == (
-            provider.provider_name
-        )
+        assert result.provider == (provider.provider_name)
 
-        assert result.model_name == (
-            provider.model_name
-        )
+        assert result.model_name == (provider.model_name)
 
         assert result.dimensions == 384
 
@@ -103,10 +97,7 @@ def test_sentence_transformer_batch_embedding() -> None:
         chunks[:3],
         start=1,
     ):
-        print(
-            f"Chunk {index}: "
-            f"{len(chunk)} characters"
-        )
+        print(f"Chunk {index}: {len(chunk)} characters")
 
     if len(chunks) > 6:
         print("\n...")
@@ -123,10 +114,7 @@ def test_sentence_transformer_batch_embedding() -> None:
         chunks[start_index:],
         start=start_index + 1,
     ):
-        print(
-            f"Chunk {index}: "
-            f"{len(chunk)} characters"
-        )
+        print(f"Chunk {index}: {len(chunk)} characters")
 
     print("\nResult Summary")
     print("-" * 80)

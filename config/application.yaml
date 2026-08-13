@@ -146,3 +146,32 @@ ocr:
 
 speech: null
 reranker: null
+
+domains:
+  employee_policies:
+    name: "Employee Policies"
+    description: >
+      Employee HR policies including leave, attendance,
+      benefits and workplace procedures.
+    enabled: true
+
+  finance_policies:
+    name: "Finance Policies"
+    description: >
+      Finance policies covering expenses, reimbursements,
+      financial approvals and financial controls.
+    enabled: true
+
+  customer_policies:
+    name: "Customer Policies"
+    description: >
+      Policies governing customer-related processes,
+      agreements, support and customer operations.
+    enabled: false
+
+  technical_documentation:
+    name: "Technical Documentation"
+    description: >
+      Technical documentation covering systems,
+      architecture, configuration and troubleshooting.
+    enabled: false
