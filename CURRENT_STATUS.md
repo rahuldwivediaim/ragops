@@ -1,23 +1,89 @@
 # RAGFramework — Current Status & Project Memory
 
-**Last Updated:** 2026-08-12  
+**Last Updated:** 2026-08-17  
 **Document Purpose:** Running source of truth for implementation status, architecture decisions, pending decisions, known limitations, quality gates, and next steps.  
-**Current Phase:** Authorization / RBAC  
-**Current Milestone:** Document-level authorization + security metadata + retrieval-time authorization  
-**Overall Status:** 🟡 IN PROGRESS — Authorization core complete; retrieval security next
+**Current Phase:** Ingestion Lifecycle / Observability Hardening  
+**Current Milestone:** Complete document lifecycle, processing-job tracking, and pipeline-event observability while preserving the successful ingestion path  
+**Overall Status:** 🟡 IN PROGRESS — Core ingestion E2E is working; lifecycle and observability persistence are incomplete
 **Status Legend:**  
 - **DONE** — implemented and tested/verified.  
 - **PENDING** — agreed work that is not yet implemented or not yet fully verified.  
 - **PLANNED** — intentionally deferred/future capability.
 
-### Latest Checkpoint — 2026-08-13
+### Latest Checkpoint — 2026-08-17
 
 **Authorization Core:** DONE  
 **Authorization Smoke Test:** DONE  
-**Current Focus:** Document-level authorization, security metadata on every chunk, and pre-retrieval Pinecone authorization filtering.  
-**Tenant Isolation:** PLANNED as a future framework capability; `tenant_id` will be designed into the metadata contract now.  
-**Audit Logging:** PLANNED for the completed application flow; audit-event design can be introduced earlier if needed.  
-**Prompt-Injection Protection:** PLANNED as the separate Guardrails plugin, independent of authorization.
+**Document Ingestion E2E:** DONE  
+**Current Focus:** Document lifecycle status transitions, processing-job tracking, pipeline-event persistence, and observability completeness.  
+**Tenant Isolation:** PLANNED as a future framework capability; `tenant_id` remains part of the intended metadata contract.  
+**Audit Logging:** PLANNED / partially prepared through the existing operation-tracking architecture; database-backed observability still needs implementation.  
+**Prompt-Injection Protection:** PLANNED as a separate Guardrails capability.
+
+### Latest Ingestion Milestone — 2026-08-17
+
+The complete document-ingestion path has been executed successfully against the controlled Edmira HR policy fixture.
+
+```text
+Stored Document
+      ↓
+DocumentIngestionService
+      ↓
+Validation
+      ↓
+TXT Parsing
+      ↓
+Chunking
+      ↓
+Parsing Metadata
+      ↓
+90 Chunks
+      ↓
+OpenAI text-embedding-3-small
+      ↓
+90 Embeddings
+      ↓
+Pinecone ragops-edmira / edmira_hr
+      ↓
+Ingestion COMPLETED
+```
+
+Successful identifiers:
+
+```text
+Document ID:
+38f74f26-e75d-4a71-9b27-ec5846411905
+
+Document Version ID:
+efea00df-45c3-4fef-821d-7c8f0f00ed34
+
+Ingestion ID:
+7d3969ba-7e75-42f4-8553-6207a56d3e31
+
+Content Hash:
+2befaed49c6bf6aa78b0955876f56ead26362cd24b7d58af2fc690c819b843d5
+```
+
+Database state after successful ingestion:
+
+```text
+tenants                    1
+domains                    2
+knowledge_bases            1
+documents                  1
+document_versions          1
+document_parsing_metadata  1
+embedding_profiles         1
+embeddings                 90
+ingestions                 1
+chunks                     90
+pipeline_events            0
+processing_jobs            0
+vector_indexes             1
+```
+
+The core ingestion path is proven. Remaining gaps are lifecycle and observability persistence rather than parsing, chunking, embedding, or vector indexing.
+
 
 
 ---
@@ -132,7 +198,35 @@ Chunking
 Subsequent ingestion processing
 ```
 
-### 4.3 Embeddings
+### 4.3 Ingestion Persistence / E2E
+
+- [DONE] TXT parser registration/import wiring
+- [DONE] End-to-end validation → parsing → chunking
+- [DONE] Parsing metadata persistence
+- [DONE] Chunk persistence
+- [DONE] OpenAI embedding generation
+- [DONE] Embedding metadata/profile persistence
+- [DONE] Pinecone vector upsert
+- [DONE] Vector index metadata persistence
+- [DONE] Ingestion record persistence
+- [DONE] Successful ingestion completion tracking
+- [DONE] Retry-safe parsing metadata persistence
+- [DONE] Embedding provider enum normalization (`openai` → `OPENAI`)
+- [DONE] Vector provider enum normalization (`pinecone` → `PINECONE`)
+
+Successful fixture produced 90 chunks and 90 embeddings and wrote the corresponding vectors to Pinecone.
+
+### 4.4 Current Ingestion/Observability Gaps
+
+- [PENDING] Document status remains `PENDING` after successful ingestion; lifecycle transitions are not wired.
+- [PENDING] `pipeline_events` has no application writer and remains empty.
+- [PENDING] `processing_jobs` has no application writer/repository and remains empty.
+- [PENDING] Database-backed operation/pipeline observability provider is not wired.
+- [PENDING] Determine whether `ProcessingJob` represents every ingestion execution or only asynchronous/background execution.
+- [PENDING] Define exact stage/event semantics for `PipelineEvent`.
+- [PENDING] Add lifecycle and observability integration tests.
+
+### 4.5 Embeddings
 
 - [DONE] Base embedding-provider abstraction
 - [DONE] Embedding result abstraction
@@ -140,7 +234,7 @@ Subsequent ingestion processing
 - [DONE] Sentence Transformer provider
 - [DONE] Batch embedding support
 
-### 4.4 Vector Store
+### 4.6 Vector Store
 
 - [DONE] Base vector-store abstraction
 - [DONE] Pinecone provider
@@ -152,13 +246,14 @@ Subsequent ingestion processing
 - [DONE] Metadata filtering interface
 - [DONE] Pinecone namespace configuration
 
-Current development/testing Pinecone namespace:
+Current successful ingestion Pinecone configuration:
 
 ```text
-batch-test
+Index:     ragops-edmira
+Namespace: edmira_hr
 ```
 
-### 4.5 Retrieval
+### 4.7 Retrieval
 
 - [DONE] Retriever abstraction
 - [DONE] Query validation
@@ -170,7 +265,7 @@ batch-test
 - [DONE] Chunk-text validation
 - [DONE] Reranker integration
 
-### 4.6 Reranking
+### 4.8 Reranking
 
 - [DONE] Reranking abstraction
 - [DONE] Local CrossEncoder integration
@@ -178,7 +273,7 @@ batch-test
 - [DONE] Comparison of Pinecone ranking and CrossEncoder ranking
 - [DONE] Unit/integration validation
 
-### 4.7 Domain Architecture
+### 4.9 Domain Architecture
 
 - [DONE] Domain model
 - [DONE] Domain configuration model
@@ -887,8 +982,11 @@ These are intentionally unresolved and must not be silently treated as complete.
 
 ## 11. Known Limitations / Technical Debt
 
-- Authorization architecture is designed but not yet implemented end-to-end.
-- Current retrieval does not yet enforce user authorization.
+- Document lifecycle status is not yet transitioned from PENDING to PROCESSING/ACTIVE/FAILED by the ingestion workflow.
+- `pipeline_events` is empty because no application persistence path has been wired.
+- `processing_jobs` is empty because no application persistence path has been wired.
+- Database-backed operation/pipeline observability is not yet connected to OperationTracker.
+- Authorization core is implemented, but retrieval-time authorization is not yet enforced end-to-end.
 - AI Intent / Domain Router is not yet implemented.
 - Production identity provider integration is not implemented.
 - Security metadata schema is not finalized.
@@ -1019,6 +1117,11 @@ Next Steps
 
 ## 🟡 Pending — Current Focus
 
+- Document lifecycle transitions: PENDING → PROCESSING → ACTIVE / FAILED
+- ProcessingJob persistence and lifecycle
+- PipelineEvent persistence for pipeline/stage observability
+- Database-backed OperationTracker/pipeline observability
+- Lifecycle and observability integration tests
 - Document-level authorization
 - Final security metadata schema
 - Metadata on every chunk/vector
@@ -1043,33 +1146,81 @@ Next Steps
 - Separate chunk-store architecture revisit
 - Full ingestion atomicity/compensation strategy
 
-## Latest Authorization Gate Result
+## Latest Confirmed Gate Results
 
 ```text
-mypy                     → PASS
-pytest                   → PASS
-ruff check               → PASS
-ruff format --check      → PASS
-python -m compileall     → PASS
-authorization smoke test → PASS
+OperationTracker compile/import        → PASS
+Parser registration                   → PASS
+Document ingestion E2E                → PASS
+Parsing metadata persistence          → PASS
+Chunks persisted                      → 90
+Embeddings persisted                  → 90
+Pinecone vector write                 → PASS
+Ingestion status                      → COMPLETED
+Embedding provider                    → OpenAI / text-embedding-3-small
+Vector provider                       → Pinecone / ragops-edmira / edmira_hr
+Authorization smoke test              → PASS
 ```
 
-These are the latest user-confirmed results for the authorization/configuration scope. A repository-wide formal gate should still be run before a repository-wide release claim.
+The following are intentionally not marked complete:
+
+```text
+Document lifecycle transitions        → PENDING
+pipeline_events persistence           → PENDING
+processing_jobs persistence            → PENDING
+database observability provider        → PENDING
+```
+
+A repository-wide formal quality gate should still be run before a repository-wide release claim.
 
 ## Next Implementation Milestone
 
 ```text
-Document-level authorization
+Inspect PipelineEvent + ProcessingJob models
         ↓
-Canonical security metadata
+Define observability persistence architecture
         ↓
-Metadata copied to every chunk/vector
+Document PENDING → PROCESSING → ACTIVE/FAILED
         ↓
-AuthorizationService → Pinecone filter
+ProcessingJob lifecycle
         ↓
-Pre-retrieval enforcement
+PipelineEvent persistence
         ↓
-Real employee/finance policy ingestion
+OperationTracker database provider
         ↓
-End-to-end security tests
+Focused lifecycle/observability tests
+        ↓
+Return to retrieval authorization
 ```
+
+
+---
+
+## 14. Fresh-Session Handoff
+
+The next session should receive the project ZIP plus this `current_status.md`.
+
+### Important baseline
+
+Do not rerun the existing successful ingestion immediately. The database already contains a valid completed ingestion with 90 chunks and 90 embeddings.
+
+### First files to inspect
+
+```text
+backend/models/pipeline_event.py
+backend/models/processing_job.py
+backend/common/enums.py
+backend/models/enums.py
+backend/operations/providers/base.py
+backend/operations/providers/logging_provider.py
+backend/operations/tracker.py
+backend/services/document_ingestion_service.py
+backend/services/ingestion_persistence_service.py
+backend/services/documents/upload_service.py
+```
+
+Also inspect the relevant Alembic migrations and repositories.
+
+### Fresh-session instruction
+
+> Reconstruct the project from the uploaded ZIP and this `current_status.md`. Verify the handoff against the source code. Do not make changes immediately. First diagnose the document lifecycle, `pipeline_events`, and `processing_jobs` gaps, then propose the exact files and implementation sequence. Preserve the successful ingestion path and work one change at a time with compile/test verification after each change.

@@ -15,6 +15,7 @@ from .exceptions import (
     PipelineConfigurationError,
     StageExecutionError,
 )
+from .observer import ProcessingStageObserver
 from .result import ProcessingResult
 from .stage import ProcessingStage
 
@@ -68,39 +69,59 @@ class ProcessingPipeline:
     def execute(
         self,
         context: ProcessingContext,
+        observer: ProcessingStageObserver | None = None,
     ) -> ProcessingResult:
         """
-        Execute the processing pipeline.
+        Execute the processing pipeline sequentially.
+
+        ``observer`` is intentionally optional so the processing framework
+        remains usable without persistence or observability infrastructure.
+        When supplied, it receives durable-lifecycle callbacks around each
+        stage. Concrete observers decide how those callbacks are persisted.
         """
 
         if not self._stages:
             raise PipelineConfigurationError("Processing pipeline contains no stages.")
 
         started_at = datetime.utcnow()
-
         completed_stage: str | None = None
 
-        try:
-            for stage in self._stages:
+        for stage in self._stages:
+            if observer is not None:
+                observer.stage_started(context, stage.name)
+
+            try:
                 stage(context)
-                completed_stage = stage.name
+            except Exception as ex:
+                if observer is not None:
+                    observer.stage_failed(
+                        context,
+                        stage.name,
+                        ex,
+                    )
 
-            return ProcessingResult.completed(
-                stage=completed_stage or "",
-                duration=datetime.utcnow() - started_at,
-            )
+                failed_stage = context.current_stage or completed_stage or stage.name
+                return ProcessingResult.failed_result(
+                    stage=failed_stage,
+                    exception=StageExecutionError(
+                        failed_stage,
+                        ex,
+                    ),
+                    duration=datetime.utcnow() - started_at,
+                )
 
-        except Exception as ex:
-            failed_stage = context.current_stage or completed_stage or "Unknown"
+            if observer is not None:
+                observer.stage_completed(
+                    context,
+                    stage.name,
+                )
 
-            return ProcessingResult.failed_result(
-                stage=failed_stage,
-                exception=StageExecutionError(
-                    failed_stage,
-                    ex,
-                ),
-                duration=datetime.utcnow() - started_at,
-            )
+            completed_stage = stage.name
+
+        return ProcessingResult.completed(
+            stage=completed_stage or "",
+            duration=datetime.utcnow() - started_at,
+        )
 
     # ------------------------------------------------------------------
     # Helpers

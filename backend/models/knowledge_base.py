@@ -1,54 +1,111 @@
 """
 Knowledge Base model.
 
-A Knowledge Base represents a logical collection of related documents.
+A Knowledge Base is a logical collection of knowledge belonging
+to exactly one domain within exactly one tenant.
+
+Relationship:
+
+    Tenant
+        └── Domain
+              └── Knowledge Base
+                    └── Documents
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum, String, Text
+from sqlalchemy import (
+    Enum,
+    ForeignKey,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.models.constants import (
+    CODE_LENGTH,
     LANGUAGE_LENGTH,
     NAME_LENGTH,
 )
 from backend.models.entity import Entity
 from backend.models.enums import KnowledgeBaseStatus
-from backend.models.mixins import CodeMixin
 
 if TYPE_CHECKING:
     from backend.models.document import Document
+    from backend.models.domain import Domain
+    from backend.models.tenant import Tenant
 
 
-class KnowledgeBase(CodeMixin, Entity):
+class KnowledgeBase(Entity):
     """
     Logical collection of business documents.
 
-    Example:
-        - HR Policies
-        - Finance SOP
-        - IT Knowledge Base
-        - Product Documentation
+    A Knowledge Base belongs to exactly one Domain.
+
+    Example
+    -------
+    Tenant:
+        ACME
+
+    Domain:
+        HR -> Payroll -> Payroll Tax
+
+    Knowledge Base:
+        Payroll Tax Policies
     """
 
     __tablename__ = "knowledge_bases"
 
-    # ------------------------------------------------------------------
-    # Business Information
-    # ------------------------------------------------------------------
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id",
+            "code",
+            name="uq_knowledge_bases_tenant_code",
+        ),
+        UniqueConstraint(
+            "tenant_id",
+            "name",
+            name="uq_knowledge_bases_tenant_name",
+        ),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(
+        ForeignKey(
+            "tenants.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    domain_id: Mapped[UUID] = mapped_column(
+        ForeignKey(
+            "domains.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    code: Mapped[str] = mapped_column(
+        String(CODE_LENGTH),
+        nullable=False,
+        index=True,
+    )
 
     name: Mapped[str] = mapped_column(
         String(NAME_LENGTH),
         nullable=False,
-        unique=True,
         index=True,
     )
 
     description: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
     )
 
     status: Mapped[KnowledgeBaseStatus] = mapped_column(
@@ -72,9 +129,17 @@ class KnowledgeBase(CodeMixin, Entity):
         nullable=False,
     )
 
-    # ------------------------------------------------------------------
-    # Relationships
-    # ------------------------------------------------------------------
+    tenant: Mapped["Tenant"] = relationship(
+        "Tenant",
+        back_populates="knowledge_bases",
+        lazy="selectin",
+    )
+
+    domain: Mapped["Domain"] = relationship(
+        "Domain",
+        back_populates="knowledge_bases",
+        lazy="selectin",
+    )
 
     documents: Mapped[list["Document"]] = relationship(
         "Document",
@@ -83,9 +148,8 @@ class KnowledgeBase(CodeMixin, Entity):
         lazy="selectin",
     )
 
-    # ------------------------------------------------------------------
-    # Object Representation
-    # ------------------------------------------------------------------
-
     def __repr__(self) -> str:
-        return f"KnowledgeBase(id={self.id}, code='{self.code}', name='{self.name}')"
+        return (
+            f"KnowledgeBase(id={self.id}, code='{self.code}', "
+            f"name='{self.name}', domain_id={self.domain_id})"
+        )

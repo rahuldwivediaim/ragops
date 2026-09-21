@@ -25,10 +25,17 @@ from .mixins import (
 )
 
 # ----------------------------------------------------------------------
-# Business Models
+# Tenant / Domain / Knowledge
 # ----------------------------------------------------------------------
 
+from .tenant import Tenant
+from .domain import Domain
 from .knowledge_base import KnowledgeBase
+
+# ----------------------------------------------------------------------
+# Document and Processing Models
+# ----------------------------------------------------------------------
+
 from .document import Document
 from .document_version import DocumentVersion
 from .document_parsing_metadata import DocumentParsingMetadata
@@ -40,6 +47,7 @@ from .pipeline_event import PipelineEvent
 from .processing_job import ProcessingJob
 from .vector_index import VectorIndex
 
+
 __all__ = [
     "Base",
     "Entity",
@@ -47,6 +55,8 @@ __all__ = [
     "TimestampMixin",
     "SoftDeleteMixin",
     "CodeMixin",
+    "Tenant",
+    "Domain",
     "KnowledgeBase",
     "Document",
     "DocumentVersion",

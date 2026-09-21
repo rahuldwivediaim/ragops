@@ -1,12 +1,9 @@
 """
-Domain management for RAGFramework.
+Domain management package.
 """
 
-from .models import Domain
-from .registry import DomainDefinition, DomainRegistry
+from .registry import DomainRegistry
 
 __all__ = [
-    "Domain",
-    "DomainDefinition",
     "DomainRegistry",
 ]

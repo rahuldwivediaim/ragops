@@ -102,7 +102,7 @@ embeddings:
   provider: openai
   model: text-embedding-3-small
   dimensions: 1536
-  timeout_seconds: 60
+  timeout_seconds: 120
   retry:
     max_attempts: 3
     initial_delay_seconds: 1.0
@@ -111,9 +111,9 @@ embeddings:
 
 vector_store:
   enabled: true
-  provider: pgvector
-  index_name: ragops
-  namespace: default
+  provider: pinecone
+  index_name: ragops-edmira
+  namespace: edmira_hr
   timeout_seconds: 60
   retry:
     max_attempts: 3
@@ -147,12 +147,55 @@ ocr:
 speech: null
 reranker: null
 
+###############################################################################
+# Domain hierarchy
+#
+# Domain relationships are configuration-driven.
+#
+# Level 1: Business domain
+# Level 2: Functional sub-domain
+# Level 3: Optional specialized category
+#
+# Knowledge Bases will later belong to exactly one domain node.
+###############################################################################
+
 domains:
+  hr:
+    name: "HR"
+    description: >
+      Human Resources covering employee management, payroll,
+      benefits and workplace policies.
+    enabled: true
+
   employee_policies:
     name: "Employee Policies"
     description: >
       Employee HR policies including leave, attendance,
       benefits and workplace procedures.
+    parent_id: hr
+    enabled: true
+
+  payroll:
+    name: "Payroll"
+    description: >
+      Payroll policies covering salary, payroll processing,
+      deductions and employee tax information.
+    parent_id: hr
+    enabled: true
+
+  payroll_tax:
+    name: "Payroll Tax"
+    description: >
+      Detailed payroll tax policies, deductions and tax
+      compliance requirements.
+    parent_id: payroll
+    enabled: true
+
+  finance:
+    name: "Finance"
+    description: >
+      Finance covering expenses, reimbursements,
+      financial approvals and financial controls.
     enabled: true
 
   finance_policies:
@@ -160,17 +203,18 @@ domains:
     description: >
       Finance policies covering expenses, reimbursements,
       financial approvals and financial controls.
+    parent_id: finance
     enabled: true
 
-  customer_policies:
-    name: "Customer Policies"
+  customer_service:
+    name: "Customer Service"
     description: >
-      Policies governing customer-related processes,
-      agreements, support and customer operations.
+      Customer-related processes, agreements, support
+      and customer operations.
     enabled: false
 
-  technical_documentation:
-    name: "Technical Documentation"
+  technical:
+    name: "Technical"
     description: >
       Technical documentation covering systems,
       architecture, configuration and troubleshooting.

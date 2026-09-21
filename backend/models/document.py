@@ -3,6 +3,17 @@ Document model.
 
 A Document represents a logical business document within a Knowledge Base.
 Each document can have multiple physical versions.
+
+Ownership hierarchy:
+
+    Tenant
+        └── Domain
+              └── KnowledgeBase
+                    └── Document
+                          └── DocumentVersion
+
+Tenant and Domain are intentionally not duplicated on Document.
+They are derived through the KnowledgeBase relationship.
 """
 
 from __future__ import annotations
@@ -34,7 +45,10 @@ class Document(Entity):
     """
     Logical business document.
 
-    A document is versioned through the DocumentVersion table.
+    A document belongs to exactly one Knowledge Base and is versioned
+    through the DocumentVersion table.
+
+    Tenant and Domain ownership are inherited through the Knowledge Base.
     """
 
     __tablename__ = "documents"
@@ -57,7 +71,10 @@ class Document(Entity):
     # ------------------------------------------------------------------
 
     knowledge_base_id: Mapped[UUID] = mapped_column(
-        ForeignKey("knowledge_bases.id"),
+        ForeignKey(
+            "knowledge_bases.id",
+            ondelete="RESTRICT",
+        ),
         nullable=False,
         index=True,
     )

@@ -23,6 +23,7 @@ from .exceptions import (
 from .pipeline import ProcessingPipeline
 from .result import ProcessingResult
 from .stage import ProcessingStage
+from .observer import ProcessingStageObserver
 
 __all__ = [
     "ProcessingContext",
@@ -31,4 +32,5 @@ __all__ = [
     "ProcessingStage",
     "PipelineError",
     "StageExecutionError",
+    "ProcessingStageObserver",
 ]

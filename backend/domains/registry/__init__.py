@@ -1,10 +1,9 @@
 """
-Domain registry.
+Domain registry package.
 """
 
-from .domain_registry import DomainDefinition, DomainRegistry
+from .domain_registry import DomainRegistry
 
 __all__ = [
-    "DomainDefinition",
     "DomainRegistry",
 ]

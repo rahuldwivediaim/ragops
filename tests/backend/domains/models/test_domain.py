@@ -19,10 +19,12 @@ def test_domain_creation() -> None:
     assert domain.id == "employee_policies"
     assert domain.name == "Employee Policies"
     assert (
-        domain.description == "Employee HR policies including leave, "
-        "attendance and benefits."
+        domain.description
+        == "Employee HR policies including leave, attendance and benefits."
     )
     assert domain.enabled is True
+    assert domain.parent_id is None
+    assert domain.is_root is True
 
 
 def test_domain_can_be_disabled() -> None:
@@ -34,6 +36,18 @@ def test_domain_can_be_disabled() -> None:
     )
 
     assert domain.enabled is False
+
+
+def test_domain_can_have_parent() -> None:
+    domain = Domain(
+        id="payroll",
+        name="Payroll",
+        description="Payroll policies.",
+        parent_id="hr",
+    )
+
+    assert domain.parent_id == "hr"
+    assert domain.is_root is False
 
 
 def test_domain_is_immutable() -> None:
@@ -85,3 +99,23 @@ def test_domain_rejects_empty_required_fields(
                 name="Employee Policies",
                 description=value,
             )
+
+
+def test_domain_rejects_empty_parent_id() -> None:
+    with pytest.raises(ValueError):
+        Domain(
+            id="payroll",
+            name="Payroll",
+            description="Payroll policies.",
+            parent_id="   ",
+        )
+
+
+def test_domain_rejects_itself_as_parent() -> None:
+    with pytest.raises(ValueError):
+        Domain(
+            id="hr",
+            name="HR",
+            description="Human Resources.",
+            parent_id="hr",
+        )

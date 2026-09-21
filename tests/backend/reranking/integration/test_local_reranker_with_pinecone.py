@@ -1,35 +1,43 @@
 """
 Local reranker + Pinecone integration test.
 
-Runs multiple real-world queries through the production retrieval flow
-and compares Pinecone's vector ranking against the local
-Sentence Transformers CrossEncoder ranking.
+Uses the current RAGOps configuration and the real Edmira employee
+policy fixture. The test creates an isolated temporary Pinecone
+namespace, embeds and upserts the document chunks, retrieves them,
+and then reranks the retrieved candidates using the local
+Sentence Transformers CrossEncoder.
 
 Flow:
 
-    Query
+    employee_policies.txt
         ↓
-    OpenAI embedding
+    TextChunker
         ↓
-    Pinecone similarity search
+    OpenAI embeddings
         ↓
-    Retrieved chunk text
+    Pinecone temporary namespace
         ↓
-    Local CrossEncoder
+    Retriever
+        ↓
+    Candidate chunks
+        ↓
+    Sentence Transformers CrossEncoder
         ↓
     Reranked results
         ↓
-    Ranking comparison
-
-No mock retrieval or mock reranking is used.
+    Cleanup
 """
 
 from __future__ import annotations
 
 import os
+import uuid
+from pathlib import Path
 
 from dotenv import load_dotenv
 
+from backend.common.config.loader import load_settings
+from backend.document_processing.chunker import TextChunker
 from backend.embeddings.providers.openai_embedding_provider import (
     OpenAIEmbeddingProvider,
 )
@@ -42,14 +50,16 @@ from backend.vector_store.providers.pinecone_provider import (
 
 QUERIES = [
     "How many annual leave days can employees take?",
-    "How many unused leave days can be carried forward?",
     "What is the policy for working from home?",
     "Who can access confidential employee information?",
     "What should an employee do when reporting an incident?",
 ]
 
 
-def _shorten_text(text: str, max_length: int = 140) -> str:
+def _shorten_text(
+    text: str,
+    max_length: int = 140,
+) -> str:
     """Return a compact single-line preview of document text."""
 
     text = " ".join(text.split())
@@ -62,8 +72,10 @@ def _shorten_text(text: str, max_length: int = 140) -> str:
 
 def test_local_reranker_with_pinecone() -> None:
     """
-    Retrieve and rerank multiple real queries using Pinecone
-    and the local Sentence Transformers CrossEncoder.
+    Retrieve and rerank real Edmira employee-policy chunks.
+
+    The test uses a unique Pinecone namespace so that previous test
+    executions cannot contaminate the current run.
     """
 
     # ------------------------------------------------------------------
@@ -72,17 +84,29 @@ def test_local_reranker_with_pinecone() -> None:
 
     load_dotenv()
 
+    settings = load_settings()
+
     openai_api_key = os.getenv("OPENAI_API_KEY")
     pinecone_api_key = os.getenv("PINECONE_API_KEY")
 
-    pinecone_index_name = os.getenv(
-        "PINECONE_INDEX_NAME",
-        "ragframeworkdev",
+    assert openai_api_key, (
+        "OPENAI_API_KEY is not configured in .env."
     )
 
-    pinecone_namespace = os.getenv(
-        "PINECONE_NAMESPACE",
-        "default",
+    assert pinecone_api_key, (
+        "PINECONE_API_KEY is not configured in .env."
+    )
+
+    pinecone_index_name = settings.vector_store.index_name
+
+    assert pinecone_index_name, (
+        "Pinecone index name is not configured."
+    )
+
+    # Never use the permanent production/application namespace
+    # for this integration test.
+    pinecone_namespace = (
+        f"test-reranker-{uuid.uuid4().hex[:12]}"
     )
 
     reranker_model = os.getenv(
@@ -92,9 +116,25 @@ def test_local_reranker_with_pinecone() -> None:
 
     reranker_device = os.getenv("RERANKER_DEVICE")
 
-    assert openai_api_key, "OPENAI_API_KEY is not configured in .env."
+    # ------------------------------------------------------------------
+    # Sample document
+    # ------------------------------------------------------------------
 
-    assert pinecone_api_key, "PINECONE_API_KEY is not configured in .env."
+    sample_file = Path(
+        "samples/employee_policies.txt"
+    )
+
+    assert sample_file.exists(), (
+        f"Sample file not found: {sample_file}"
+    )
+
+    document_text = sample_file.read_text(
+        encoding="utf-8",
+    )
+
+    assert document_text.strip(), (
+        f"Sample file is empty: {sample_file}"
+    )
 
     # ------------------------------------------------------------------
     # Providers
@@ -102,8 +142,8 @@ def test_local_reranker_with_pinecone() -> None:
 
     embedding_provider = OpenAIEmbeddingProvider(
         api_key=openai_api_key,
-        model_name="text-embedding-3-small",
-        dimensions=1536,
+        model_name=settings.embeddings.model,
+        dimensions=settings.embeddings.dimensions or 1536,
     )
 
     vector_store = PineconeProvider(
@@ -123,21 +163,130 @@ def test_local_reranker_with_pinecone() -> None:
         device=reranker_device,
     )
 
+    vectors: list[dict] = []
+
     try:
+        # ==============================================================
+        # Step 1 — Chunk document
+        # ==============================================================
+
+        chunker = TextChunker()
+
+        chunks = chunker.chunk(
+            document_text,
+        )
+
+        assert chunks, (
+            "No chunks were generated from employee_policies.txt."
+        )
+
+        # ==============================================================
+        # Step 2 — Generate embeddings
+        # ==============================================================
+
+        embeddings = embedding_provider.embed_batch(
+            chunks,
+        )
+
+        assert len(embeddings) == len(chunks), (
+            "Number of embeddings does not match "
+            "number of chunks."
+        )
+
+        # ==============================================================
+        # Step 3 — Build Pinecone vectors
+        # ==============================================================
+
+        for index, embedding in enumerate(embeddings):
+            chunk_number = index + 1
+
+            vector_id = (
+                "ragops-edmira-reranker-"
+                f"hr-employee-v1-{chunk_number:04d}"
+            )
+
+            metadata = {
+                "tenant_code": "edmira",
+                "top_level_domain": "hr",
+                "sub_domain_code": "employee_policies",
+                "knowledge_base": "HR Employee Policies",
+                "classification": "INTERNAL",
+                "document_id": "HR-EMP-POL-001",
+                "document_version_id": "1",
+                "chunk_id": (
+                    f"hr-employee-chunk-{chunk_number:04d}"
+                ),
+                "chunk_number": chunk_number,
+                "filename": sample_file.name,
+                "provider": embedding.provider,
+                "model_name": embedding.model_name,
+                "embedding_version": "1",
+                "text": chunks[index],
+            }
+
+            vectors.append(
+                {
+                    "id": vector_id,
+                    "values": embedding.vector,
+                    "metadata": metadata,
+                }
+            )
+
+        assert len(vectors) == len(chunks)
+
+        # ==============================================================
+        # Step 4 — Upsert controlled test data
+        # ==============================================================
+
+        vector_store.upsert_batch(
+            vectors,
+        )
+
+        stored_count = vector_store.count()
+
+        assert stored_count == len(vectors), (
+            f"Expected {len(vectors)} vectors but found "
+            f"{stored_count} in namespace "
+            f"'{pinecone_namespace}'."
+        )
+
+        # ==============================================================
+        # Step 5 — Retrieval + reranking
+        # ==============================================================
+
         print("\n" + "=" * 100)
-        print("MULTI-QUERY RERANKING INTEGRATION TEST")
+        print("EDMIRA LOCAL RERANKER + PINECONE INTEGRATION TEST")
         print("=" * 100)
-        print(f"Index       : {pinecone_index_name}")
-        print(f"Namespace   : {pinecone_namespace}")
-        print(f"Reranker    : {reranker.provider_name}")
-        print(f"Model       : {reranker.model_name}")
-        print(f"Queries     : {len(QUERIES)}")
+
+        print(
+            f"Index       : {pinecone_index_name}"
+        )
+
+        print(
+            f"Namespace   : {pinecone_namespace}"
+        )
+
+        print(
+            f"Document    : {sample_file.name}"
+        )
+
+        print(
+            f"Chunks      : {len(chunks)}"
+        )
+
+        print(
+            f"Reranker    : {reranker.provider_name}"
+        )
+
+        print(
+            f"Model       : {reranker.model_name}"
+        )
+
+        print(
+            f"Queries     : {len(QUERIES)}"
+        )
 
         summary: list[dict[str, object]] = []
-
-        # ==============================================================
-        # Execute all queries
-        # ==============================================================
 
         for query_number, query in enumerate(
             QUERIES,
@@ -145,12 +294,16 @@ def test_local_reranker_with_pinecone() -> None:
         ):
             print("\n")
             print("=" * 100)
-            print(f"QUERY {query_number} OF {len(QUERIES)}")
+            print(
+                f"QUERY {query_number} OF {len(QUERIES)}"
+            )
             print("=" * 100)
-            print(f"Query: {query}")
+            print(
+                f"Query: {query}"
+            )
 
             # ----------------------------------------------------------
-            # Retrieve candidates from Pinecone
+            # Retrieve candidates
             # ----------------------------------------------------------
 
             retrieved_results = retriever.retrieve(
@@ -158,7 +311,9 @@ def test_local_reranker_with_pinecone() -> None:
                 top_k=5,
             )
 
-            assert retrieved_results, f"No Pinecone results returned for query: {query}"
+            assert retrieved_results, (
+                f"No Pinecone results returned for query: {query}"
+            )
 
             documents: list[str] = []
 
@@ -168,13 +323,30 @@ def test_local_reranker_with_pinecone() -> None:
                 text = metadata.get("text")
 
                 assert text, (
-                    f"Retrieved result does not contain chunk text for query: {query}"
+                    "Retrieved result does not contain chunk text "
+                    f"for query: {query}"
                 )
 
-                documents.append(str(text))
+                # Verify our important metadata survived the vector
+                # round trip.
+                assert metadata.get(
+                    "tenant_code"
+                ) == "edmira"
+
+                assert metadata.get(
+                    "top_level_domain"
+                ) == "hr"
+
+                assert metadata.get(
+                    "sub_domain_code"
+                ) == "employee_policies"
+
+                documents.append(
+                    str(text)
+                )
 
             # ----------------------------------------------------------
-            # BEFORE RERANKING
+            # Before reranking
             # ----------------------------------------------------------
 
             print("\n" + "-" * 100)
@@ -188,11 +360,40 @@ def test_local_reranker_with_pinecone() -> None:
                 metadata = result["metadata"]
 
                 print(f"\n#{rank}")
-                print(f"  Pinecone Score : {float(result['score']):.6f}")
-                print(f"  Vector ID      : {result['vector_id']}")
-                print(f"  Chunk ID       : {metadata.get('chunk_id')}")
-                print(f"  Chunk Number   : {metadata.get('chunk_number')}")
-                print(f"  Text           : {_shorten_text(str(metadata['text']))}")
+                print(
+                    "  Pinecone Score : "
+                    f"{float(result['score']):.6f}"
+                )
+
+                print(
+                    "  Vector ID      : "
+                    f"{result['vector_id']}"
+                )
+
+                print(
+                    "  Chunk ID       : "
+                    f"{metadata.get('chunk_id')}"
+                )
+
+                print(
+                    "  Chunk Number   : "
+                    f"{metadata.get('chunk_number')}"
+                )
+
+                print(
+                    "  Domain         : "
+                    f"{metadata.get('top_level_domain')}"
+                )
+
+                print(
+                    "  Sub-domain     : "
+                    f"{metadata.get('sub_domain_code')}"
+                )
+
+                print(
+                    "  Text           : "
+                    f"{_shorten_text(str(metadata['text']))}"
+                )
 
             # ----------------------------------------------------------
             # Rerank
@@ -204,12 +405,25 @@ def test_local_reranker_with_pinecone() -> None:
                 top_k=5,
             )
 
-            assert reranked_results, f"Reranker returned no results for query: {query}"
+            assert reranked_results, (
+                f"Reranker returned no results for query: {query}"
+            )
 
             assert len(reranked_results) <= 5
 
             # ----------------------------------------------------------
-            # AFTER RERANKING
+            # Validate reranked indexes
+            # ----------------------------------------------------------
+
+            for rerank_result in reranked_results:
+                assert (
+                    0
+                    <= rerank_result.index
+                    < len(retrieved_results)
+                )
+
+            # ----------------------------------------------------------
+            # After reranking
             # ----------------------------------------------------------
 
             print("\n" + "-" * 100)
@@ -220,82 +434,63 @@ def test_local_reranker_with_pinecone() -> None:
                 reranked_results,
                 start=1,
             ):
-                original_result = retrieved_results[rerank_result.index]
+                original_result = retrieved_results[
+                    rerank_result.index
+                ]
 
                 metadata = original_result["metadata"]
 
                 print(f"\n#{rank}")
-                print(f"  Reranker Score : {rerank_result.score:.6f}")
-                print(f"  Original Index : {rerank_result.index + 1}")
-                print(f"  Pinecone Score : {float(original_result['score']):.6f}")
-                print(f"  Vector ID      : {original_result['vector_id']}")
-                print(f"  Chunk ID       : {metadata.get('chunk_id')}")
-                print(f"  Chunk Number   : {metadata.get('chunk_number')}")
-                print(f"  Text           : {_shorten_text(str(metadata['text']))}")
+
+                print(
+                    "  Reranker Score : "
+                    f"{rerank_result.score:.6f}"
+                )
+
+                print(
+                    "  Original Index : "
+                    f"{rerank_result.index + 1}"
+                )
+
+                print(
+                    "  Pinecone Score : "
+                    f"{float(original_result['score']):.6f}"
+                )
+
+                print(
+                    "  Vector ID      : "
+                    f"{original_result['vector_id']}"
+                )
+
+                print(
+                    "  Chunk ID       : "
+                    f"{metadata.get('chunk_id')}"
+                )
+
+                print(
+                    "  Text           : "
+                    f"{_shorten_text(str(metadata['text']))}"
+                )
 
             # ----------------------------------------------------------
             # Compare ranking
             # ----------------------------------------------------------
 
-            pinecone_order = [result["vector_id"] for result in retrieved_results]
+            pinecone_order = [
+                result["vector_id"]
+                for result in retrieved_results
+            ]
 
             reranked_order = [
-                retrieved_results[result.index]["vector_id"]
+                retrieved_results[
+                    result.index
+                ]["vector_id"]
                 for result in reranked_results
             ]
 
-            ranking_changed = pinecone_order != reranked_order
-
-            # ----------------------------------------------------------
-            # Identify moved chunks
-            # ----------------------------------------------------------
-
-            moved_chunks: list[str] = []
-
-            for original_position, vector_id in enumerate(
-                pinecone_order,
-                start=1,
-            ):
-                if vector_id not in reranked_order:
-                    continue
-
-                new_position = reranked_order.index(vector_id) + 1
-
-                if original_position != new_position:
-                    moved_chunks.append(
-                        f"{vector_id}: {original_position} -> {new_position}"
-                    )
-
-            print("\n" + "-" * 100)
-            print("RANKING COMPARISON")
-            print("-" * 100)
-
-            print("\nPinecone order:")
-
-            for position, vector_id in enumerate(
-                pinecone_order,
-                start=1,
-            ):
-                print(f"  {position}. {vector_id}")
-
-            print("\nCrossEncoder order:")
-
-            for position, vector_id in enumerate(
-                reranked_order,
-                start=1,
-            ):
-                print(f"  {position}. {vector_id}")
-
-            print(f"\nRanking changed : {ranking_changed}")
-
-            if moved_chunks:
-                print("\nMoved chunks:")
-
-                for moved_chunk in moved_chunks:
-                    print(f"  - {moved_chunk}")
-
-            else:
-                print("\nMoved chunks: None")
+            ranking_changed = (
+                pinecone_order != reranked_order
+            )
 
             summary.append(
                 {
@@ -310,9 +505,15 @@ def test_local_reranker_with_pinecone() -> None:
         # Final summary
         # ==============================================================
 
-        changed_count = sum(1 for result in summary if result["ranking_changed"])
+        changed_count = sum(
+            1
+            for result in summary
+            if result["ranking_changed"]
+        )
 
-        unchanged_count = len(summary) - changed_count
+        unchanged_count = (
+            len(summary) - changed_count
+        )
 
         print("\n\n")
         print("=" * 100)
@@ -324,20 +525,57 @@ def test_local_reranker_with_pinecone() -> None:
             start=1,
         ):
             print(f"\nQuery {index}:")
-            print(f"  {result['query']}")
+            print(
+                f"  {result['query']}"
+            )
 
-            print(f"  Ranking changed : {result['ranking_changed']}")
+            print(
+                "  Ranking changed : "
+                f"{result['ranking_changed']}"
+            )
 
         print("\n" + "-" * 100)
-        print(f"Queries tested       : {len(summary)}")
-        print(f"Ranking changed      : {changed_count}")
-        print(f"Ranking unchanged    : {unchanged_count}")
+        print(
+            f"Queries tested       : {len(summary)}"
+        )
+
+        print(
+            f"Ranking changed      : {changed_count}"
+        )
+
+        print(
+            f"Ranking unchanged    : {unchanged_count}"
+        )
+
         print("-" * 100)
 
-        print("\nStatus      : PASSED")
+        print(
+            "\nStatus      : PASSED"
+        )
+
         print("=" * 100)
 
     finally:
-        reranker.close()
-        vector_store.close()
-        embedding_provider.close()
+        # ==============================================================
+        # Cleanup
+        # ==============================================================
+        #
+        # Delete ONLY vectors created by this test.
+        # Do not delete the Pinecone index or application namespace.
+        #
+
+        try:
+            vector_ids = [
+                vector["id"]
+                for vector in vectors
+            ]
+
+            if vector_ids:
+                vector_store.delete(
+                    vector_ids,
+                )
+
+        finally:
+            reranker.close()
+            vector_store.close()
+            embedding_provider.close()

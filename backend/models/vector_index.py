@@ -20,12 +20,11 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.models.constants import (
-    NAME_LENGTH,
-)
+from backend.models.constants import NAME_LENGTH
 from backend.models.entity import Entity
 from backend.models.enums import (
     StorageProvider,
+    VectorInfrastructureMode,
     VectorProvider,
 )
 
@@ -104,6 +103,15 @@ class VectorIndex(Entity):
         nullable=False,
     )
 
+    management_mode: Mapped[VectorInfrastructureMode] = mapped_column(
+        Enum(
+            VectorInfrastructureMode,
+            name="vector_infrastructure_mode",
+        ),
+        nullable=False,
+        default=VectorInfrastructureMode.RAGOPS_MANAGED,
+    )
+
     storage_provider: Mapped[StorageProvider] = mapped_column(
         Enum(
             StorageProvider,
@@ -157,5 +165,6 @@ class VectorIndex(Entity):
             f"id={self.id}, "
             f"name='{self.name}', "
             f"provider='{self.provider.value}', "
-            f"index='{self.index_name}')"
+            f"index='{self.index_name}', "
+            f"management_mode='{self.management_mode.value}')"
         )

@@ -11,6 +11,33 @@ from enum import Enum
 
 
 # ============================================================================
+# Tenant
+# ============================================================================
+
+
+class TenantStatus(str, Enum):
+    """Tenant lifecycle."""
+
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
+    SUSPENDED = "SUSPENDED"
+    ARCHIVED = "ARCHIVED"
+
+
+# ============================================================================
+# Domain
+# ============================================================================
+
+
+class DomainStatus(str, Enum):
+    """Domain lifecycle."""
+
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
+    ARCHIVED = "ARCHIVED"
+
+
+# ============================================================================
 # Knowledge Base
 # ============================================================================
 
@@ -134,6 +161,13 @@ class VectorProvider(str, Enum):
     QDRANT = "QDRANT"
     CHROMA = "CHROMA"
     MILVUS = "MILVUS"
+
+
+class VectorInfrastructureMode(str, Enum):
+    """How RAGOps manages the physical vector infrastructure."""
+
+    RAGOPS_MANAGED = "RAGOPS_MANAGED"
+    CUSTOMER_MANAGED = "CUSTOMER_MANAGED"
 
 
 class StorageProvider(str, Enum):

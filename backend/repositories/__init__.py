@@ -4,6 +4,8 @@ Repository exports.
 
 from __future__ import annotations
 
+from .domain_repository import DomainRepository
+
 from backend.repositories.document_parsing_metadata_repository import (
     DocumentParsingMetadataRepository,
 )
@@ -22,4 +24,5 @@ __all__ = [
     "DocumentVersionRepository",
     "DocumentParsingMetadataRepository",
     "KnowledgeBaseRepository",
+    "DomainRepository",
 ]

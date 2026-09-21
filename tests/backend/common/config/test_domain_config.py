@@ -17,6 +17,8 @@ def test_domain_config_creation() -> None:
     assert config.name == "Employee Policies"
     assert config.description == "Employee HR policies."
     assert config.enabled is True
+    assert config.parent_id is None
+    assert config.is_root is True
 
 
 def test_domain_config_can_be_disabled() -> None:
@@ -27,6 +29,17 @@ def test_domain_config_can_be_disabled() -> None:
     )
 
     assert config.enabled is False
+
+
+def test_domain_config_can_have_parent() -> None:
+    config = DomainConfig(
+        name="Payroll",
+        description="Payroll policies.",
+        parent_id="hr",
+    )
+
+    assert config.parent_id == "hr"
+    assert config.is_root is False
 
 
 @pytest.mark.parametrize(
@@ -54,6 +67,15 @@ def test_domain_config_rejects_empty_values(
                 name="Employee Policies",
                 description=value,
             )
+
+
+def test_domain_config_rejects_empty_parent_id() -> None:
+    with pytest.raises(ValueError):
+        DomainConfig(
+            name="Payroll",
+            description="Payroll policies.",
+            parent_id="   ",
+        )
 
 
 def test_domain_config_rejects_unknown_fields() -> None:

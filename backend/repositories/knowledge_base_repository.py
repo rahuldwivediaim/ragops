@@ -8,6 +8,8 @@ Purpose:
 
 from __future__ import annotations
 
+from uuid import UUID
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -17,47 +19,71 @@ from backend.repositories.base_repository import BaseRepository
 
 
 class KnowledgeBaseRepository(BaseRepository[KnowledgeBase]):
-    """Repository for KnowledgeBase."""
+    """Repository for Knowledge Base database operations."""
 
     def __init__(self, session: Session) -> None:
         super().__init__(session, KnowledgeBase)
 
-    def get_by_code(self, code: str) -> KnowledgeBase | None:
-        """Return a knowledge base by its code."""
+    def get_by_code(
+        self,
+        tenant_id: UUID,
+        code: str,
+    ) -> KnowledgeBase | None:
+        """Return a knowledge base by code within a tenant."""
 
         statement = select(KnowledgeBase).where(
+            KnowledgeBase.tenant_id == tenant_id,
             KnowledgeBase.code == code,
         )
 
         return self._session.scalar(statement)
 
-    def get_by_name(self, name: str) -> KnowledgeBase | None:
-        """Return a knowledge base by its name."""
+    def get_by_name(
+        self,
+        tenant_id: UUID,
+        name: str,
+    ) -> KnowledgeBase | None:
+        """Return a knowledge base by name within a tenant."""
 
         statement = select(KnowledgeBase).where(
+            KnowledgeBase.tenant_id == tenant_id,
             KnowledgeBase.name == name,
         )
 
         return self._session.scalar(statement)
 
-    def exists_by_code(self, code: str) -> bool:
-        """Check whether a knowledge base code already exists."""
+    def exists_by_code(
+        self,
+        tenant_id: UUID,
+        code: str,
+    ) -> bool:
+        """Check whether a knowledge base code exists within a tenant."""
 
         statement = (
             select(func.count())
             .select_from(KnowledgeBase)
-            .where(KnowledgeBase.code == code)
+            .where(
+                KnowledgeBase.tenant_id == tenant_id,
+                KnowledgeBase.code == code,
+            )
         )
 
         return (self._session.scalar(statement) or 0) > 0
 
-    def exists_by_name(self, name: str) -> bool:
-        """Check whether a knowledge base name already exists."""
+    def exists_by_name(
+        self,
+        tenant_id: UUID,
+        name: str,
+    ) -> bool:
+        """Check whether a knowledge base name exists within a tenant."""
 
         statement = (
             select(func.count())
             .select_from(KnowledgeBase)
-            .where(KnowledgeBase.name == name)
+            .where(
+                KnowledgeBase.tenant_id == tenant_id,
+                KnowledgeBase.name == name,
+            )
         )
 
         return (self._session.scalar(statement) or 0) > 0
@@ -78,6 +104,9 @@ class KnowledgeBaseRepository(BaseRepository[KnowledgeBase]):
     def get_all_ordered(self) -> list[KnowledgeBase]:
         """Return all knowledge bases ordered by name."""
 
-        statement = select(KnowledgeBase).order_by(KnowledgeBase.name)
+        statement = (
+            select(KnowledgeBase)
+            .order_by(KnowledgeBase.name)
+        )
 
         return list(self._session.scalars(statement).all())

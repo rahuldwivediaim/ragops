@@ -119,3 +119,54 @@ def test_access_scope_rejects_empty_knowledge_base(
                 {knowledge_base_id},
             ),
         )
+
+
+def test_access_scope_union_includes_policy_ids() -> None:
+    employee_scope = AccessScope(
+        domains=frozenset({"employee_policies"}),
+        knowledge_bases=frozenset({"employee_kb"}),
+        access_policy_ids=frozenset(
+            {"employee_access"},
+        ),
+    )
+
+    finance_scope = AccessScope(
+        domains=frozenset({"finance_policies"}),
+        knowledge_bases=frozenset({"finance_kb"}),
+        access_policy_ids=frozenset(
+            {"finance_access"},
+        ),
+    )
+
+    effective_scope = employee_scope.union(
+        finance_scope,
+    )
+
+    assert effective_scope.access_policy_ids == frozenset(
+        {
+            "employee_access",
+            "finance_access",
+        },
+    )
+
+
+def test_accss_scope_can_check_policy() -> None:
+    scope = AccessScope(
+        access_policy_ids=frozenset(
+            {"employee_access"},
+        ),
+    )
+
+    assert (
+        scope.includes_policy(
+            "employee_access",
+        )
+        is True
+    )
+
+    assert (
+        scope.includes_policy(
+            "finance_access",
+        )
+        is False
+    )

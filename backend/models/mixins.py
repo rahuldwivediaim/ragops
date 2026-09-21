@@ -61,12 +61,24 @@ class SoftDeleteMixin:
 
 class CodeMixin:
     """
-    Adds a unique business code.
+    Adds a required human-readable business code.
+
+    Uniqueness is intentionally not defined here because the correct
+    uniqueness scope depends on the owning entity.
+
+    Examples:
+        Tenant:
+            UNIQUE(code)
+
+        Domain:
+            UNIQUE(tenant_id, code)
+
+        KnowledgeBase:
+            UNIQUE(tenant_id, code)
     """
 
     code: Mapped[str] = mapped_column(
         String(CODE_LENGTH),
-        unique=True,
         nullable=False,
         index=True,
     )

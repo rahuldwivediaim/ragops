@@ -162,6 +162,7 @@ class UploadService:
                 document=document,
                 version=version,
                 stored_document=stored_document,
+                knowledge_base=knowledge_base,
             )
 
             return self._build_response(
@@ -469,6 +470,7 @@ class UploadService:
         document: Document,
         version: DocumentVersion,
         stored_document,
+        knowledge_base,
     ) -> None:
         """
         Trigger document ingestion.
@@ -488,6 +490,7 @@ class UploadService:
         metadata = self._build_ingestion_metadata(
             document=document,
             version=version,
+            knowledge_base=knowledge_base,
         )
 
         self._ingestion_service.ingest(
@@ -536,13 +539,19 @@ class UploadService:
         *,
         document: Document,
         version: DocumentVersion,
+        knowledge_base,
     ) -> dict[str, str]:
         """
         Build metadata supplied to the ingestion pipeline.
+
+        The metadata contains the complete ownership hierarchy so that
+        downstream vector metadata can support tenant/domain/KB filtering.
         """
 
         return {
+            "tenant_id": str(knowledge_base.tenant_id),
+            "domain_id": str(knowledge_base.domain_id),
+            "knowledge_base_id": str(knowledge_base.id),
             "document_id": str(document.id),
             "document_version_id": str(version.id),
-            "knowledge_base_id": str(document.knowledge_base_id),
         }

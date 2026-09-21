@@ -92,9 +92,7 @@ class AuthorizationService:
         user: User,
         permission: Permission,
     ) -> bool:
-        """
-        Return whether a user has the specified permission.
-        """
+        """Return whether a user has the specified permission."""
 
         return self.authorize_permission(
             user=user,
@@ -110,6 +108,9 @@ class AuthorizationService:
 
         The effective scope is the union of all access policies
         referenced by all roles assigned to the user.
+
+        Policy identifiers are retained because document-level
+        authorization uses them to construct retrieval filters.
         """
 
         effective_scope = AccessScope()
@@ -127,6 +128,9 @@ class AuthorizationService:
                     knowledge_bases=frozenset(
                         policy.knowledge_bases,
                     ),
+                    access_policy_ids=frozenset(
+                        {policy_id},
+                    ),
                 )
 
                 effective_scope = effective_scope.union(
@@ -140,9 +144,7 @@ class AuthorizationService:
         user: User,
         domain_id: str,
     ) -> bool:
-        """
-        Return whether a user can access a specific domain.
-        """
+        """Return whether a user can access a specific domain."""
 
         return self.get_access_scope(user).includes_domain(
             domain_id,
@@ -161,6 +163,21 @@ class AuthorizationService:
             user,
         ).includes_knowledge_base(
             knowledge_base_id,
+        )
+
+    def is_policy_authorized(
+        self,
+        user: User,
+        policy_id: str,
+    ) -> bool:
+        """
+        Return whether a user has the specified access policy.
+        """
+
+        return self.get_access_scope(
+            user,
+        ).includes_policy(
+            policy_id,
         )
 
     def _validate_role_policy_references(self) -> None:

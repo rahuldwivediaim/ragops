@@ -48,6 +48,7 @@ class OperationTracker:
         resource_id: str | None = None,
         resource_name: str | None = None,
         correlation_id: str | None = None,
+        metadata: dict[str, str] | None = None,
     ) -> OperationContext:
         """
         Start a new business operation.
@@ -68,6 +69,8 @@ class OperationTracker:
             correlation_id:
                 Existing correlation identifier. If omitted,
                 a new identifier is generated.
+            metadata:
+                Additional metadata associated with the operation.
 
         Returns:
             Mutable operation context.
@@ -81,6 +84,7 @@ class OperationTracker:
             user_id=user_id,
             resource_id=resource_id,
             resource_name=resource_name,
+            metadata=dict(metadata or {}),
         )
 
         self._publish(self._create_record(context))
